@@ -1,3 +1,9 @@
+2020-04-13 v-0.1
+Grid2GMT:
+Add an option MAPLINE GMT_YX_K for Krovak map coordinates.
+Create a bash script instead of a csh script.
+Call GMT modules via gmt executable.
+========================================================================
 2020-04-11
 Init repo. Based on the A. Lomax distribution
 http://alomax.free.fr/nlloc/softbeta/tar/NLLbeta_src.tgz of 2018-12-06.

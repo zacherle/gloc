@@ -1,3 +1,14 @@
+2020-04-14 v-0.2
+Remove most of the marginal utilities and programs.
+(GridCascadingDecimate.c, Loc2ddct.c, NLDiffLoc.c, PhsAssoc.c,
+ Vel2Grid3D.c, fmm2grid.c, fpfit2hyp.c, hypoe2hyp.c, interface2fmm.c,
+ alomax_matrix/polarization.c,
+ alomax_matrix/test_real_symmetric_eigen.c,
+ matrix_statistics/matrix_statistics_DEV.c,
+ matrix_statistics/test_ellipsoid.c)
+Only core programs are needed.
+(Vel2Grid, Grid2Time, Time2Angles, NLLoc, LocSum, Grid2GMT, Time2EQ)
+========================================================================
 2020-04-13 v-0.1
 Grid2GMT:
 Add an option MAPLINE GMT_YX_K for Krovak map coordinates.

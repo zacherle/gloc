@@ -5,6 +5,8 @@
  *
  */
 
+//depend: no
+
 typedef double**  MatrixDouble;
 typedef double*  VectorDouble;
 

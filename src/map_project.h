@@ -1,4 +1,7 @@
 
+
+//depend: no
+
 int map_setup_proxy(int n_proj, char* ellipsoid_name);
 
 // Lambert Conformal Conic projection

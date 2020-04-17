@@ -53,24 +53,21 @@ tel: +33(0)493752502  e-mail: anthony@alomax.net  web: http://www.alomax.net
 
 
 
-#ifdef CUSTOM_ETH
-#define PNAME  "NLLoc(ETH)"
-#else
 #define PNAME  "NLLoc"
-#endif
 
+#include <stdio.h>
 #include "GridLib.h"
-#include "ran1/ran1.h"
-#include "velmod.h"
 #include "GridMemLib.h"
-#include "calc_crust_corr.h"
+#include "velmod.h"
 #include "phaseloclist.h"
 #include "otime_limit.h"
+#include "alomax_matrix/alomax_matrix.h"
 #include "NLLocLib.h"
 
-#ifdef CUSTOM_ETH
-#include "custom_eth/eth_functions.h"
-#endif
+#include "ran1/ran1.h"
+#include "util.h"
+#include <stdlib.h>
+#include <string.h>
 
 /** function to perform global search event locations */
 
@@ -196,20 +193,6 @@ int NLLoc
     } else {
         fp_control = NULL;
     }
-
-
-#ifdef CUSTOM_ETH
-    /* SH 02/27/2004
-    added snap_pid   */
-    strcpy(snap_pid, pid_main);
-    /* SH 02AUG2004 not needed any more
-    // AJL 20040527 added snap param file
-    if (argc > 3)
-    strcpy(snap_param_file, argv[3]);
-    else
-    strcpy(snap_param_file, "snap_param.txt");
-     */
-#endif
 
 
     /* read NLLoc control statements from control file */

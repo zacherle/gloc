@@ -38,8 +38,14 @@
 #endif
 
 
-#include "util.h"
+#include <stdio.h>
 #include "velmod.h"
+
+#include "util.h"
+#include <stdlib.h>
+#include <string.h>
+#include <math.h>
+#include <limits.h>
 
 
 int Get2Dto3DTrans(char* input_line);

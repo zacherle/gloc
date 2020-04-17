@@ -29,10 +29,7 @@
 	Geosciences Azur, Valbonne, France
 */
 
-
-
-#include <stdlib.h>
-#include <stdio.h>
+//depend: no
 
 
 #ifndef MAXLINE

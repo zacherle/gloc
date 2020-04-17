@@ -27,7 +27,7 @@ CC=gcc
 
 
 # Linux
-CCFLAGS_BASIC =  -Wall -std=gnu99 ${GRID_FLOAT}
+CCFLAGS_BASIC =  -Wall -std=gnu99 ${GRID_FLOAT} -Wno-unused-but-set-variable
 #
 #
 # optimized
@@ -62,7 +62,7 @@ TIME3D_CCFLAGS=
 # Top level variables and rules
 #
 GRID_LIB_OBJS=GridLib.o util.o geo.o octtree/octtree.o alomax_matrix/alomax_matrix.o alomax_matrix/eigv.o alomax_matrix/alomax_matrix_svd.o matrix_statistics/matrix_statistics.o vector/vector.o ran1/ran1.o map_project.o
-NLLOC_LIB_OBJS=calc_crust_corr.o velmod.o GridMemLib.o phaselist.o loclist.o otime_limit.o
+NLLOC_LIB_OBJS=velmod.o GridMemLib.o phaselist.o loclist.o otime_limit.o
 
 DISTRIB_SOURCES=NLLoc_ Vel2Grid_ Grid2Time_ Time2Angles_ Grid2GMT_ LocSum_ scat2latlon_ Time2EQ_ oct2grid_
 all : ${DISTRIB_SOURCES}
@@ -235,8 +235,6 @@ phaselist.o : phaselist.c phaseloclist.h  GridLib.h
 loclist.o : loclist.c phaseloclist.h  GridLib.h
 
 otime_limit.o : otime_limit.c otime_limit.h
-
-calc_crust_corr.o :   GridLib.h calc_crust_corr.c crust_corr_model.h  crust_type.h  crust_type_key.h
 
 #
 # --------------------------------------------------------------------------

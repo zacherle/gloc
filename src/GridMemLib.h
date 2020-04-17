@@ -1,3 +1,6 @@
+
+//depend: #include "GridLib.h"
+
 /*------------------------------------------------------------*/
 /** grid memory management routines */
 

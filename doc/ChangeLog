@@ -1,3 +1,10 @@
+2020-04-17 v-0.3
+1) Remove unreachable code:
+(ApplyCrustElevCorrFlag=0 was hard coded in NLLoc1.c)
+calc_crust_corr.c, calc_crust_corr.h, crust_corr_model.h, crust_type.h,
+crust_type_key.h. Function applyCrustElevCorrection returns 0.0.
+2) Minimize #include directives in header files and reorder in the code.
+========================================================================
 2020-04-14 v-0.2
 Remove most of the marginal utilities and programs.
 (GridCascadingDecimate.c, Loc2ddct.c, NLDiffLoc.c, PhsAssoc.c,

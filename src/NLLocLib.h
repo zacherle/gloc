@@ -32,15 +32,11 @@ tel: +33(0)493752502  e-mail: anthony@alomax.net  web: http://www.alomax.net
  */
 
 
-/* the following should be included before NLLocLib.h in all sources that include NLLocLib.h
-#include "GridLib.h"
-#include "ran1.h"
-#include "velmod.h"
-#include "GridMemLib.h"
-#include "calc_crust_corr.h"
-#include "phaseloclist.h"
-#include "otime_limit.h"
- * */
+//depend: #include "GridLib.h"
+//        #include "velmod.h"
+//        #include "phaseloclist.h"
+//        #include "otime_limit.h"
+//        #include "alomax_matrix/alomax_matrix.h"
 
 
 /* defines */

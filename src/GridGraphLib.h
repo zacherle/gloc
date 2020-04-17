@@ -33,16 +33,8 @@
 /*------------------------------------------------------------/ */
 
 
-
-/* include files */
-
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <math.h>
-/*#include <errno.h> */
-#include <time.h>
-/*#include <float.h> */
+//depend: #include <stdio.h>
+//        #include "GridLib.h"
 
 
 /* defines */
@@ -52,8 +44,6 @@
 #else
 #define EXTERN_TXT
 #endif
-
-
 
 
 

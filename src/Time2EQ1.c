@@ -42,12 +42,18 @@
  */
 
 
-
 #define PNAME  "Time2EQ"
 
-#include "GridLib.h"
-#include "ran1/ran1.h"
 
+#include <stdio.h>
+#include "GridLib.h"
+
+#include "ran1/ran1.h"
+#include "util.h"
+#include <math.h>
+#include <stdlib.h>
+#include <string.h>
+#include <ctype.h>
 
 /* defines */
 

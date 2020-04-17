@@ -1,4 +1,6 @@
 
+//depend: no
+
 #ifdef EXTERN_MODE
 #define EXTERN_TXT extern
 #else

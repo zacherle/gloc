@@ -5,8 +5,8 @@ NonLinLoc is a set of programs for locating earthquakes in 3D structures and for
 
 This repository was initialized based on the source code from the last published distribution
 [NLLbeta_src.tgz](http://alomax.free.fr/nlloc/softbeta/tar/NLLbeta_src.tgz) of 2018-12-06.
-Only core programs (Vel2Grid, Grid2Time, Time2Angles, NLLoc, LocSum, Grid2GMT, Time2EQ ) from this distribution are needed. 
-Most utilities and marginal programs have been deleted.
+Only core programs (Vel2Grid, Grid2Time, Time2Angles, NLLoc, LocSum, Grid2GMT, Time2EQ ) from this distribution
+are of interest. Most utilities and marginal programs have been deleted.
 
 ## Intentions
 The program will be tested on earthquakes in the NE Czech Republic published in

@@ -45,9 +45,16 @@ tel: +33(0)493752502  e-mail: anthony@alomax.net  web: http://www.alomax.net
 
 #define EXTERN_MODE 1
 
+#include <stdio.h>
 #include "../geometry/geometry.h"
-#include "../ran1/ran1.h"
 #include "octtree.h"
+
+#include "../ran1/ran1.h"
+#include <stdlib.h>
+#include <string.h>
+#include <math.h>
+#include <limits.h>
+#include <time.h>
 
 /*** function to create a new OctNode */
 

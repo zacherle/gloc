@@ -31,8 +31,6 @@ www.alomax.net
  */
 
 
-
-
 #define PACKAGE  "NonLinLoc"
 #define PVER  "7.00.02"
 #define PDATE "17Oct2018"
@@ -40,58 +38,18 @@ www.alomax.net
 #define PCOPYRIGHT "\0"
 
 
-#include <stdlib.h>
-#include <stdio.h>
-#include <string.h>
-#include <math.h>
-#include <float.h>
-#include <limits.h>
-#include <time.h>
-#include <dirent.h>
-#include <fnmatch.h>
-/* SH 07222004 added */
-#include <ctype.h>
-/*
-#ifdef __APPLE__
-#include <sys/types.h>
-#endif
- */
+//depend: #include <stdio.h>
+
+#include "geometry/geometry.h"
+#include "matrix_statistics/matrix_statistics.h"
+#include "octtree/octtree.h"
+
 
 #ifdef EXTERN_MODE
 #define EXTERN_TXT extern
 #else
 #define EXTERN_TXT
 #endif
-
-#include "geometry/geometry.h"
-#include "alomax_matrix/alomax_matrix.h"
-#include "alomax_matrix/alomax_matrix_svd.h"
-#include "matrix_statistics/matrix_statistics.h"
-#include "util.h"
-#include "geo.h"
-#include "ran1/ran1.h"
-#include "map_project.h"
-#include "octtree/octtree.h"
-
-/*
-// following inline probably does nothing - functions body must be defined in header file
-#ifndef INLINE
-#ifndef __GNUC__
-#define inline
-#else
-#define __inline__
-#endif
-#endif
- */
-
-// the following defines needed for old cc version
-#ifndef SEEK_SET
-#define SEEK_SET 0
-#endif
-#ifndef SEEK_CUR
-#define SEEK_CUR 1
-#endif
-
 
 // 20100614 AJL -
 // the following sets globally the float size (float or double) for NLL grids - modify with care!
@@ -868,7 +826,6 @@ char* CurrTimeStr(void);
 
 /* file list functions */
 int ExpandWildCards(char*, char[][FILENAME_MAX], int);
-int fnmatch_wrapper(const struct dirent* entry);
 EXTERN_TXT char ExpandWildCards_pattern[FILENAME_MAX];
 
 /* string / char functions */

@@ -42,9 +42,16 @@ tel: +33(0)493752502  e-mail: anthony@alomax.net  web: http://www.alomax.net
 
 #define EXTERN_MODE 1
 
+
+#include <stdio.h>
 #include "GridLib.h"
 #include "phaseloclist.h"
-//#include "ran1.h"
+
+#include <stdlib.h>
+#include <string.h>
+#include <math.h>
+#include <limits.h>
+#include <time.h>
 
 
 /** function to create a copy of a PhsNode */

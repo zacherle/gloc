@@ -32,13 +32,8 @@ Anthony Lomax Scientific Software
 tel: +33(0)493752502  e-mail: anthony@alomax.net  web: http://www.alomax.net
 -------------------------------------------------------------------------*/
 
-
-#include <stdlib.h>
-#include <stdio.h>
-#include <string.h>
-#include <math.h>
-#include <limits.h>
-#include <time.h>
+//depend: #include <stdio.h>
+//        #include "../geometry/geometry.h"
 
 #ifdef EXTERN_MODE
 #define	EXTERN_TXT extern

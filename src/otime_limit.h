@@ -5,6 +5,8 @@
  * Created on 14 September 2009, 15:52
  */
 
+//depend: no
+
 #ifndef _OTIME_LIMIT_H
 #define	_OTIME_LIMIT_H
 

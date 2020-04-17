@@ -9,6 +9,10 @@
  * modified: 2010.12.16
  ***************************************************************************/
 
+
+//depend: #include "../geometry/geometry.h"
+
+
 #define CONFIDENCE_LEVEL 68.0   // 68% confidence level used throughout
 
 // 2D ellipse

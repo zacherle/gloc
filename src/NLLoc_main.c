@@ -44,41 +44,28 @@ tel: +33(0)493752502  e-mail: anthony@alomax.net  web: http://www.alomax.net
 */
 
 
-
-
-
-#ifdef CUSTOM_ETH
-#define PNAME  "NLLoc(ETH)"
-#else
 #define PNAME  "NLLoc"
-#endif
 
+
+#include <stdio.h>
 #include "GridLib.h"
-#include "ran1/ran1.h"
 #include "velmod.h"
-#include "GridMemLib.h"
-#include "calc_crust_corr.h"
 #include "phaseloclist.h"
 #include "otime_limit.h"
+#include "alomax_matrix/alomax_matrix.h"
 #include "NLLocLib.h"
 
-#ifdef CUSTOM_ETH
-#include "custom_eth/eth_functions.h"
-#endif
-
+#include "ran1/ran1.h"
+#include "util.h"
+#include <string.h>
 
 // function declarations
 
 
 /** program to perform global search event locations */
 
-#ifdef CUSTOM_ETH
-#define NARGS_MIN 3
-#define ARG_DESC "<control file> <snap_pid> <snap_param_file>"
-#else
 #define NARGS_MIN 2
 #define ARG_DESC "<control file>"
-#endif
 
 int main(int argc, char *argv[])
 {
@@ -100,21 +87,6 @@ int main(int argc, char *argv[])
 
 	// set control file
 	strcpy(fn_control_main, argv[1]);
-
-#ifdef CUSTOM_ETH
-	// SH 02/27/2004 added snap_pid
-	if (argc > 2)
-		strcpy(pid_main, argv[2]);
-	else
-		strcpy(pid_main, "000");
-	/* SH 02AUG2004 not needed any more
-	// AJL 20040527 added snap param file
-	if (argc > 3)
-		strcpy(snap_param_file, argv[3]);
-	else
-		strcpy(snap_param_file, "snap_param.txt");
-	*/
-#endif
 
 	// run NLLoc
 	istat = NLLoc(pid_main, fn_control_main, NULL, -1, NULL, -1, 0, 0, 0, NULL);

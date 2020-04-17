@@ -5,13 +5,13 @@
  *
  */
 
+#include "alomax_matrix.h"
 
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
 #include <math.h>
 #include <float.h>
-#include "alomax_matrix.h"
 #include "alomax_matrix_svd.h"
 #include "eigv.h"
 

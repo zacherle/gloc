@@ -12,6 +12,8 @@
   // some geo constants
   //
 
+//depend: #include <math.h>
+
 // 20171122 AJL  #define PI 3.14159265359
 #define PI M_PI
 // 20171122 AJL  #define TWOPI 6.28318530718

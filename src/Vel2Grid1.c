@@ -45,9 +45,14 @@
 
 #define PNAME  "Vel2Grid"
 
+#include <stdio.h>
 #include "GridLib.h"
 #include "velmod.h"
 
+#include "util.h"
+#include <stdlib.h>
+#include <string.h>
+#include <ctype.h>
 
 
 /* globals  */

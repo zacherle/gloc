@@ -104,21 +104,24 @@ e-mail: anthony@alomax.net  web: http://www.alomax.net
 
 
 
-
-
+#include <stdio.h>
 #include "GridLib.h"
-#include "ran1/ran1.h"
-#include "velmod.h"
 #include "GridMemLib.h"
-#include "calc_crust_corr.h"
+#include "velmod.h"
 #include "phaseloclist.h"
 #include "otime_limit.h"
+#include "alomax_matrix/alomax_matrix.h"
 #include "NLLocLib.h"
 
-#ifdef CUSTOM_ETH
-#include "custom_eth/eth_functions.h"
-#endif
-
+#include "ran1/ran1.h"
+#include "util.h"
+#include "geo.h"
+#include <stdlib.h>
+#include <string.h>
+#include <math.h>
+#include <float.h>
+#include <limits.h>
+#include <ctype.h>
 
 // AJL - 20080710 (valgrind)
 /* locally allocated memory which must be cleaned up */
@@ -901,15 +904,6 @@ int SaveLocation(HypoDesc* hypo, int ngrid, char* fnobs, char *fnout, int numArr
             isave_phases, 1, 0, LocGrid + ngrid, 0);
 
     /*  save requested hypocenter/phase formats */
-
-#ifdef CUSTOM_ETH
-    /* SH 02/26/2004
-            added new routine WriteSnapSum to write hypocenter summary to file (SNAP format) */
-    // must call WriteSnapSum before other output because it sets ETH magnitudes
-    if (iSaveSnapSum) {
-        WriteSnapSum(NULL, hypo, Arrival, NumArrivals);
-    }
-#endif
 
     if (iSaveNLLocEvent) {
         /* write NLLoc hypocenter to event file */
@@ -3424,17 +3418,6 @@ int GetNextObs(HypoDesc* phypo, FILE* fp_obs, ArrivalDesc *arrival, char* ftype_
                                 the value of VpVsRatio specified in NLLoc control file will be overwritten!
                                 SH 11/25/2004
                                 VpVsRatio should only be read from LOCfile if NLLoc is used within SNAP */
-#ifdef CUSTOM_ETH
-                if (strcmp(eth_line_key, "INST") == 0) {
-                    istat = ReadFortranReal(line, 23, 6, &vpvs);
-                    if (istat != 1) {
-                        nll_puterr(
-                                "WARNING: could not read VpVsRatio! Use value of control file\n");
-                    } else {
-                        VpVsRatio = vpvs;
-                    }
-                }
-#endif
                 /* SH 07/26/2004
                                                 other identiers for SED_LOC are regi, Tele and Unkn  */
                 if ((strcmp(eth_line_key, "Loca") == 0) ||
@@ -4729,7 +4712,7 @@ Origin:
                 if (ifound) {
                     // read magnitude
                     //        ML        0.99 +/- 0.11   4 preferred
-                    istat = sscanf(line, "%*s %lf %*s %*lf %d", &phypo->amp_mag, &phypo->num_amp_mag);
+                    istat = sscanf(line, "%*s %lf %*s %*f %d", &phypo->amp_mag, &phypo->num_amp_mag);
                     //printf("DEBUG: TEXNET_BULLETIN preferred magnitude: %lf %d\n", phypo->amp_mag, phypo->num_amp_mag);
 
                 }
@@ -12641,6 +12624,7 @@ int getTravelTimes(ArrivalDesc *arrival, int num_arr_loc, double xval, double yv
 double applyCrustElevCorrection(ArrivalDesc* parrival, double xval, double yval, double zval) {
 
     double correction = 0.0;
+/*
     double dtdd = 0.0;
     char cphase;
 
@@ -12658,7 +12642,7 @@ double applyCrustElevCorrection(ArrivalDesc* parrival, double xval, double yval,
     correction +=
             calc_crust_corr(cphase, parrival->station.dlat,
             parrival->station.dlong, 0.0, -1000.0 * parrival->station.depth, dtdd);
-
+*/
     return (correction);
 
 }

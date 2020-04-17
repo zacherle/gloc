@@ -12,17 +12,14 @@
 
 
 
-
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <float.h>
-#include <math.h>
+#include "../geometry/geometry.h"
+#include "matrix_statistics.h"
 
 #include "../vector/vector.h"
-#include "../geometry/geometry.h"
 #include "../alomax_matrix/alomax_matrix.h"
-#include "matrix_statistics.h"
+#include <stdio.h>
+#include <float.h>
+#include <math.h>
 
 // 20171122 AJL  #define RA2DE 57.2957795129
 // 20171122 AJL  #define DE2RA 0.01745329252

@@ -25,10 +25,17 @@
 
 #define EXTERN_MODE 1
 #define INPUT_DEV 1
+
+#include <stdio.h>
 #include "GridLib.h"
 #include "GridGraphLib.h"
-#include "vector/vector.h"
 
+#include "util.h"
+#include <stdlib.h>
+#include <string.h>
+#include <math.h>
+#include <time.h>
+#include <ctype.h>
 
 
 /*** function to set constants */

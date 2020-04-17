@@ -47,13 +47,19 @@ tel: +33(0)493752502  e-mail: anthony@alomax.net  web: http://www.alomax.net
 
 /*#define EXTERN_MODE 1 */
 
-#include <unistd.h>
 
+#include <stdio.h>
 #include "GridLib.h"
 
+#include "util.h"
+#include <math.h>
+#include <stdlib.h>
+#include <string.h>
+#include <unistd.h>
+#include <ctype.h>
+
+
 #define DEBUG_GRID2TIME 0
-
-
 
 /*------------------------------------------------------------/ */
 /* declarations for grid modes */

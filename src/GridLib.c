@@ -46,9 +46,26 @@ tel: +33(0)493752502  e-mail: anthony@alomax.net  web: http://www.alomax.net
 
 #define EXTERN_MODE 1
 
+#include <stdio.h>
 #include "GridLib.h"
 
+#include "util.h"
+#include "geo.h"
+#include "map_project.h"
+#include "ran1/ran1.h"
+
+#include <math.h>
+#include <stdlib.h>
+#include <string.h>
+#include <time.h>
+#include <dirent.h>
+#include <fnmatch.h>
+/* SH 07222004 added */
+#include <ctype.h>
+
 // private funtions
+int fnmatch_wrapper(const struct dirent* entry);
+
 int _WriteLocation(FILE *fpio, HypoDesc* phypo, ArrivalDesc* parrivals,
         int narrivals, char* filename,
         int iWriteArrivals, int iWriteEndLoc, int iWriteMinimal,
@@ -3573,7 +3590,7 @@ int GetHypLoc(FILE *fpio, const char* filein, HypoDesc* phypo,
 
             if (sscanf(line,
                     "QML_OriginQuality  assocPhCt %d  usedPhCt %*d  assocStaCt %d  usedStaCt %d  depthPhCt %d"
-                    "  stdErr %*lg  azGap %*lg  secAzGap %lg  gtLevel %s  minDist %lg maxDist %lg medDist %lg",
+                    "  stdErr %*g  azGap %*g  secAzGap %lg  gtLevel %s  minDist %lg maxDist %lg medDist %lg",
                     &phypo->associatedPhaseCount, &phypo->associatedStationCount, &phypo->usedStationCount, &phypo->depthPhaseCount,
                     &phypo->gap_secondary, phypo->groundTruthLevel, &phypo->minimumDistance, &phypo->maximumDistance, &phypo->medianDistance) == EOF)
                 goto eof_exit;
@@ -3582,7 +3599,7 @@ int GetHypLoc(FILE *fpio, const char* filein, HypoDesc* phypo,
 
             double azMaxHorUnc;
             if (sscanf(line,
-                    "QML_OriginUncertainty  horUnc %*lg  minHorUnc %lg  maxHorUnc %lg  azMaxHorUnc %lg",
+                    "QML_OriginUncertainty  horUnc %*g  minHorUnc %lg  maxHorUnc %lg  azMaxHorUnc %lg",
                     // 20100617 AJL - horizontalUncertainty: not clear what this is, ignore
                     &phypo->ellipse.len1, &phypo->ellipse.len2, &azMaxHorUnc) == EOF)
                 goto eof_exit;

@@ -54,7 +54,7 @@ tel: +33(0)493752502  e-mail: anthony@alomax.net  web: http://www.alomax.net
 #include "ran1/ran1.h"
 #include "velmod.h"
 #include "GridMemLib.h"
-#include "calc_crust_corr.h"
+//#include "calc_crust_corr.h"
 #include "phaseloclist.h"
 #include "otime_limit.h"
 #include "NLLocLib.h"

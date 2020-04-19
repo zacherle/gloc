@@ -44,7 +44,6 @@ tel: +33(0)493752502  e-mail: anthony@alomax.net  web: http://www.alomax.net
 
 
 
-#define EXTERN_MODE 1
 
 #include <stdio.h>
 #include "GridLib.h"
@@ -53,7 +52,6 @@ tel: +33(0)493752502  e-mail: anthony@alomax.net  web: http://www.alomax.net
 #include "geo.h"
 #include "map_project.h"
 #include "ran1/ran1.h"
-
 #include <math.h>
 #include <stdlib.h>
 #include <string.h>
@@ -62,6 +60,93 @@ tel: +33(0)493752502  e-mail: anthony@alomax.net  web: http://www.alomax.net
 #include <fnmatch.h>
 /* SH 07222004 added */
 #include <ctype.h>
+
+// ---------------------------------------------------------------------
+//global var
+
+/* program mode */
+int nll_mode;
+
+/* phase identification */
+PhaseIdent PhaseID[MAX_NUM_PHASE_ID];
+int NumPhaseID;
+
+char fn_control[MAXLINE]; /* control file name */
+FILE *fp_control; /* control file pointer */
+char fn_output[MAXLINE]; /* output file name */
+
+/* miscellaneous */
+int RandomNumSeed;
+int NumFilesOpen;
+int NumGridBufFilesOpen, NumGridHdrFilesOpen;
+int NumAllocations;
+
+/* algorithm constants */
+int prog_mode_3d;
+int prog_mode_2dto3d;
+
+// mode
+int GeometryMode;
+
+/* 3D grid description */
+int grid_type; /* grid type (VELOCITY, SLOWNESS, SLOW2, etc) */
+GridDesc grid_in;
+
+/* source */
+int NumSources;
+SourceDesc Source[MAX_NUM_SOURCES];
+
+/* stations */
+StationDesc Station[MAX_NUM_SOURCES];
+
+/* arrivals */
+int PhaseFormat;
+int MAX_NUM_STATIONS;
+int MAX_NUM_ARRIVALS;
+int NumArrivals;
+ArrivalDesc* Arrival;
+
+/* hypocenter */
+HypoDesc Hypocenter;
+
+/* geographic transformations (lat/long <=> x/y) */
+char map_trans_type[NUM_PROJ_MAX][MAXLINE]; /* name of projection */
+int map_itype[NUM_PROJ_MAX]; /* int id of projection */
+char MapProjStr[NUM_PROJ_MAX][2 * MAXLINE]; /* string description of proj params */
+char map_ref_ellipsoid[NUM_PROJ_MAX][MAXLINE]; /* name of reference ellipsoid */
+/* general map parameters */
+double map_orig_lat[NUM_PROJ_MAX], map_orig_long[NUM_PROJ_MAX], map_rot[NUM_PROJ_MAX];
+double map_cosang[NUM_PROJ_MAX], map_sinang[NUM_PROJ_MAX]; /* rotation */
+/* LAMBERT projection parameters */
+double map_lambert_1st_std_paral[NUM_PROJ_MAX], map_lambert_2nd_std_paral[NUM_PROJ_MAX];
+/* SDC Short Distance Coversion projection parameters */
+double map_sdc_xltkm[NUM_PROJ_MAX], map_sdc_xlnkm[NUM_PROJ_MAX];
+#define MAP_TRANS_SDC_DRLT 0.99330647
+
+/* constants */
+double cPI;
+double cRPD;
+double c111;
+
+/* include file */
+char fn_include[FILENAME_MAX];
+FILE* fp_include;
+FILE* fp_input_save;
+
+/* take-off angle */
+TakeOffAngles AnglesNULL;
+
+/* quality to error mapping (hypo71, etc) */
+double Quality2Error[MAX_NUM_QUALITY_LEVELS];
+int NumQuality2ErrorLevels;
+
+/* file list functions */
+int ExpandWildCards(char*, char[][FILENAME_MAX], int);
+char ExpandWildCards_pattern[FILENAME_MAX];
+
+/* model coordinates */
+int ModelCoordsMode;
+// ---------------------------------------------------------------------
 
 // private funtions
 int fnmatch_wrapper(const struct dirent* entry);
@@ -3366,7 +3451,8 @@ int GetHypLoc(FILE *fpio, const char* filein, HypoDesc* phypo,
         ArrivalDesc* parrivals, int *pnarrivals, int iReadArrivals,
         GridDesc* pgrid, int n_proj) {
 
-    int istat, ifile = 0;
+//    int istat;
+    int ifile = 0;
     int lineLength;
     char fn_in[FILENAME_MAX];
     char line[MAXLINE_LONG], *pstr, *pstr2 = NULL;
@@ -3630,7 +3716,8 @@ int GetHypLoc(FILE *fpio, const char* filein, HypoDesc* phypo,
                         break;
                     }
                     parr = parrivals + *pnarrivals;
-                    istat = ReadArrival(line, parr, IO_ARRIVAL_ALL);
+//                    istat = ReadArrival(line, parr, IO_ARRIVAL_ALL);
+                    ReadArrival(line, parr, IO_ARRIVAL_ALL);
                     (*pnarrivals)++;
                 };
             }/* not requested to read arrivals */
@@ -6004,8 +6091,9 @@ int WriteDiffArrival(FILE* fpio, HypoDesc* hypos, ArrivalDesc* parr, int iWriteT
 int CalcAnglesGradient(GridDesc* ptgrid, GridDesc* pagrid, int angle_mode, int grid_mode) {
 
     int ix, iy, iz, edge_flagx = 0, edge_flagy = 0, iflag2D = 0;
-    double origx, origy, origz;
-    double dx, dy, dz, dvol;
+//    double origx, origy, origz;
+    double dx, dy, dz;
+//    double dvol;
     double xlow = 0.0, xhigh = 0.0;
     double azim, dip;
     int iqual;
@@ -6025,13 +6113,13 @@ int CalcAnglesGradient(GridDesc* ptgrid, GridDesc* pagrid, int angle_mode, int g
 
     /* estimate take-off angles from numerical gradients */
 
-    origx = pagrid->origx;
-    origy = pagrid->origy;
-    origz = pagrid->origz;
+//  origx = pagrid->origx;
+//  origy = pagrid->origy;
+//  origz = pagrid->origz;
     dx = pagrid->dx;
     dy = pagrid->dy;
     dz = pagrid->dz;
-    dvol = dx * dy * dz;
+//  dvol = dx * dy * dz;
 
     for (ix = 0; ix < pagrid->numx; ix++) {
         /* 2D grids, store angles in ix = 0 sheet */

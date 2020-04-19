@@ -44,7 +44,6 @@
 
 #define PNAME  "Time2EQ"
 
-
 #include <stdio.h>
 #include "GridLib.h"
 

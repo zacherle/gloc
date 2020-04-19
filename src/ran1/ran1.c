@@ -5,6 +5,10 @@
 #include <stdio.h>
 
 
+int RanSeed;
+
+#define RAND_FUNC() uni()
+#define RAND_MAX1 1.0
 
 
 /*//////// Anthony Lomax stuff */

@@ -45,9 +45,6 @@ tel: +33(0)493752502  e-mail: anthony@alomax.net  web: http://www.alomax.net
 
 
 
-/*#define EXTERN_MODE 1 */
-
-
 #include <stdio.h>
 #include "GridLib.h"
 
@@ -1120,22 +1117,22 @@ int GenAngleGrid(GridDesc* ptgrid, SourceDesc* psource, GridDesc* pagrid, int an
     int istat, itemp = 0;
     char filename[MAXLINE_LONG];
 
-    double xsource, ysource, zsource;
+//    double xsource, ysource, zsource;
 
 
 
     /* check grid mode, make appropriate adjustments */
 
-    if (grid_mode == GRID_TIME_2D) {
-        /* set horiz source location to grid origin */
-        xsource = pagrid->origx;
-        ysource = pagrid->origy;
-        zsource = psource->z;
-    } else {
-        xsource = psource->x;
-        ysource = psource->y;
-        zsource = psource->z;
-    }
+//    if (grid_mode == GRID_TIME_2D) {
+//        /* set horiz source location to grid origin */
+//        xsource = pagrid->origx;
+//        ysource = pagrid->origy;
+//        zsource = psource->z;
+//    } else {
+//        xsource = psource->x;
+//        ysource = psource->y;
+//        zsource = psource->z;
+//    }
 
 
 

@@ -52,7 +52,6 @@ tel: +33(0)493752502  e-mail: anthony@alomax.net  web: http://www.alomax.net
  */
 
 
-
 #include <stdio.h>
 #include "GridLib.h"
 #include "GridGraphLib.h"
@@ -2063,7 +2062,8 @@ int ReadGrid2GMT_Input(FILE* fp_input) {
     char param[MAXLINE];
     char line[MAXLINE];
 
-    int flag_control = 0, flag_trans = 0, flag_grid = 0;
+    int flag_control = 0, flag_trans = 0;
+//    int flag_grid = 0;
 
 
     mapGridRead = 0;
@@ -2128,7 +2128,7 @@ int ReadGrid2GMT_Input(FILE* fp_input) {
             if ((istat = get_grid(strchr(line, ' '))) < 0)
                 nll_puterr("ERROR: reading grid parameters.");
             else {
-                flag_grid = 1;
+//                flag_grid = 1;
                 mapGridRead = 1;
             }
         }

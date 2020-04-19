@@ -45,7 +45,6 @@
  */
 
 
-
 #include <stdio.h>
 #include "GridLib.h"
 
@@ -152,7 +151,8 @@ int SumLocations(int argc, char** argv) {
     static char fn_hyp_in_list[MAX_NUM_INPUT_FILES][FILENAME_MAX];
     char test_str[10];
 
-    double xmin, xmax, ymin, ymax, zmin, zmax;
+//    double xmin, ymin, zmin;
+//    double xmax, ymax, zmax;
 
     double Len3Max, ProbMin, RMSMax;
     int NRdgsMin, GapMax;
@@ -248,12 +248,12 @@ int SumLocations(int argc, char** argv) {
         nll_puterr2("ERROR: open grid header file", MsgStr);
         return (-1);
     }
-    xmin = Grid.origx;
-    xmax = xmin + (double) (Grid.numx - 1) * Grid.dx;
-    ymin = Grid.origy;
-    ymax = ymin + (double) (Grid.numy - 1) * Grid.dy;
-    zmin = Grid.origz;
-    zmax = zmin + (double) (Grid.numz - 1) * Grid.dz;
+//    xmin = Grid.origx;
+//    xmax = xmin + (double) (Grid.numx - 1) * Grid.dx;
+//    ymin = Grid.origy;
+//    ymax = ymin + (double) (Grid.numy - 1) * Grid.dy;
+//    zmin = Grid.origz;
+//    zmax = zmin + (double) (Grid.numz - 1) * Grid.dz;
 
 
 

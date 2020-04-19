@@ -40,9 +40,6 @@ tel: +33(0)493752502  e-mail: anthony@alomax.net  web: http://www.alomax.net
 
 
 
-#define EXTERN_MODE 1
-
-
 #include <stdio.h>
 #include "GridLib.h"
 #include "phaseloclist.h"
@@ -217,47 +214,6 @@ void freeLocation(Location *plocation)
 
 }
 
-
-/** function to create a new LocNode from a NLL-HypocenterPhase file */
-/*
-LocNode *addNLLLocationFileToLocList(LocNode **phead, char *filein, int id, PhsNode *phsNodeList)
-{
-
-	int i;
-	HypoDesc *phypo = NULL;
-	ArrivalDesc* parrivals;
-	int narrivals;
-	GridDesc *pgrid;
-	Location *plocation;
-
-
-	phypo = (HypoDesc*) malloc(sizeof(HypoDesc));
-	pgrid = (GridDesc*) malloc(sizeof(GridDesc));
-
-	if ( GetHypLoc(NULL, filein, phypo, arrivals_tmp, &narrivals, 1, pgrid, -1) != 0 ) {
-		free(phypo);
-		free(pgrid);
-		return(NULL);
-	}
-
-	parrivals = (ArrivalDesc*) calloc(narrivals, sizeof(ArrivalDesc));
-	if (parrivals == NULL) {	// memory allocation problem
-		printf( "loclist: ERROR: allocating memory for arrivals.\n");
-	} else {
-		for (i = 0; i < narrivals; i++)
-			parrivals[i] = arrivals_tmp[i];
-	}
-
-	plocation = newLocation(phypo, parrivals, narrivals, pgrid);
-	if (plocation == NULL) {	// memory allocation problem
-		printf( "loclist: ERROR: constructin new location.\n");
-		return(NULL);
-	}
-
-	return(addLocationToLocList(phead, plocation, id));
-
-}
-*/
 
 
 /** function to display location list */

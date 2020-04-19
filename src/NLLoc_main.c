@@ -43,9 +43,7 @@ tel: +33(0)493752502  e-mail: anthony@alomax.net  web: http://www.alomax.net
 
 */
 
-
-#define PNAME  "NLLoc"
-
+/** program to perform global search event locations */
 
 #include <stdio.h>
 #include "GridLib.h"
@@ -59,10 +57,8 @@ tel: +33(0)493752502  e-mail: anthony@alomax.net  web: http://www.alomax.net
 #include "util.h"
 #include <string.h>
 
-// function declarations
 
-
-/** program to perform global search event locations */
+#define PNAME  "NLLoc"
 
 #define NARGS_MIN 2
 #define ARG_DESC "<control file>"

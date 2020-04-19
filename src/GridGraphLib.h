@@ -37,27 +37,6 @@
 //        #include "GridLib.h"
 
 
-/* defines */
-
-#ifdef EXTERN_MODE
-#define	EXTERN_TXT extern
-#else
-#define EXTERN_TXT
-#endif
-
-
-
-/*------------------------------------------------------------/ */
-/* macros */
-/*------------------------------------------------------------/ */
-
-
-/* */
-/*------------------------------------------------------------/ */
-
-
-
-
 /*------------------------------------------------------------/ */
 /* structures */
 /*------------------------------------------------------------/ */
@@ -84,10 +63,10 @@ struct GrStation {
     double yloc;    	/* y location */
     double xloc;    	/* x location */
 };
-EXTERN_TXT int gr_num_sta;		/* number of stations read */
+//extern int gr_num_sta;		/* number of stations read */
 
 #define MAX_NUM_STA 100
-EXTERN_TXT struct GrStation sta_array[MAX_NUM_STA];
+//extern struct GrStation sta_array[MAX_NUM_STA];
 
 
 	/* graphics text */
@@ -103,10 +82,10 @@ struct GrTxt {
     int rot;   		 	/* rotation in deg */
 };
 
-EXTERN_TXT int gr_num_txt;		/* number of text strings read */
+//extern int gr_num_txt;		/* number of text strings read */
 
 #define MAX_NUM_TXT 100
-EXTERN_TXT struct GrTxt txt_array[MAX_NUM_TXT];
+//extern struct GrTxt txt_array[MAX_NUM_TXT];
 
 	/* graphics lines */
 
@@ -122,10 +101,10 @@ struct GrLine {
     char style[11];     /* style */
 };
 
-EXTERN_TXT int gr_num_line;		/* number of lines read */
+//extern int gr_num_line;		/* number of lines read */
 
 #define MAX_NUM_LINE 100
-EXTERN_TXT struct GrLine line_array[MAX_NUM_LINE];
+//extern struct GrLine line_array[MAX_NUM_LINE];
 
 	/* map line files */
 
@@ -136,33 +115,10 @@ struct GrMapLines {
     ColRGB rgb;			/* line color */
 };
 
-EXTERN_TXT int gr_num_map_files;	/* number of map files */
+extern int gr_num_map_files;	/* number of map files */
 
 #define MAX_NUM_MAP 10
-EXTERN_TXT struct GrMapLines mapfile[MAX_NUM_MAP];
-
-
-
-
-
-
-
-/* */
-/*------------------------------------------------------------/ */
-
-
-
-
-/*------------------------------------------------------------/ */
-/* globals  */
-/*------------------------------------------------------------/ */
-
-
-
-/* */
-/*------------------------------------------------------------/ */
-
-
+extern struct GrMapLines mapfile[MAX_NUM_MAP];
 
 
 /*------------------------------------------------------------/ */

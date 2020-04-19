@@ -31,7 +31,6 @@
 
 //depend: no
 
-
 #ifndef MAXLINE
 #define MAXLINE 101
 #endif
@@ -40,13 +39,14 @@
 #define VERY_SMALL_DOUBLE 1.0e-30
 #endif
 
-EXTERN_TXT char package_name[MAXLINE];
-EXTERN_TXT char prog_name[MAXLINE];
-EXTERN_TXT char prog_ver[MAXLINE];
-EXTERN_TXT char prog_date[MAXLINE];
-EXTERN_TXT char prog_copyright[MAXLINE];
-EXTERN_TXT int message_flag;
-EXTERN_TXT char MsgStr[10 * MAXLINE];
+//global var
+extern char package_name[MAXLINE];
+extern char prog_name[MAXLINE];
+extern char prog_ver[MAXLINE];
+extern char prog_date[MAXLINE];
+extern char prog_copyright[MAXLINE];
+extern int message_flag;
+extern char MsgStr[10 * MAXLINE];
 
 
 /*** function to display command usage */
@@ -74,19 +74,4 @@ int checkRangeInt(const char * name, const char * param, int val,
 /*** function to check that double val is in range */
 int checkRangeDouble(const char * name, const char * param, double val,
 	int checkMin, double min, int checkMax, double max);
-
-/* misc structures */
-
-/* 3D vector or point */
-// AEH/AJL 20080709 - already in geometry.h
-/*
-struct Vect3D {
-	double x;
-	double y;
-	double z;
-};
-*/
-
-
-
 

@@ -35,19 +35,19 @@
 	21 SEP 1998	AJL	Extracted from GridLib.c
 */
 
-
-
-#ifdef EXTERN_MODE
-#define	EXTERN_TXT extern
-#else
-#define EXTERN_TXT
-#endif
-
 #include "util.h"
 
 #include <stdlib.h>
 #include <stdio.h>
 
+//global var
+char package_name[MAXLINE];
+char prog_name[MAXLINE];
+char prog_ver[MAXLINE];
+char prog_date[MAXLINE];
+char prog_copyright[MAXLINE];
+int message_flag;
+char MsgStr[10 * MAXLINE];
 
 
 /*** function to display correct command line usage */

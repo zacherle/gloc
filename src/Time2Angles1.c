@@ -80,7 +80,6 @@ TAMODE ANGLES_YES
  */
 
 
-
 #include <stdio.h>
 #include "GridLib.h"
 
@@ -481,22 +480,22 @@ int GenAngleGrid(GridDesc* ptgrid, SourceDesc* psource, GridDesc* pagrid, int an
     int istat, itemp = 0;
     char filename[MAXLINE];
 
-    double xsource, ysource, zsource;
+//    double xsource, ysource, zsource;
 
 
 
     /* check grid mode, make appropriate adjustments */
 
-    if (ptgrid->type == GRID_TIME_2D) {
-        /* set horiz source location to grid origin */
-        xsource = pagrid->origx;
-        ysource = pagrid->origy;
-        zsource = psource->z;
-    } else {
-        xsource = psource->x;
-        ysource = psource->y;
-        zsource = psource->z;
-    }
+//    if (ptgrid->type == GRID_TIME_2D) {
+//        /* set horiz source location to grid origin */
+//        xsource = pagrid->origx;
+//        ysource = pagrid->origy;
+//        zsource = psource->z;
+//    } else {
+//        xsource = psource->x;
+//        ysource = psource->y;
+//        zsource = psource->z;
+//    }
 
 
 

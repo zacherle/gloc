@@ -23,9 +23,6 @@
 
 */
 
-#define EXTERN_MODE 1
-#define INPUT_DEV 1
-
 #include <stdio.h>
 #include "GridLib.h"
 #include "GridGraphLib.h"
@@ -36,6 +33,18 @@
 #include <math.h>
 #include <time.h>
 #include <ctype.h>
+
+
+//global var
+int gr_num_sta;		/* number of stations read */
+struct GrStation sta_array[MAX_NUM_STA];
+int gr_num_txt;		/* number of text strings read */
+struct GrTxt txt_array[MAX_NUM_TXT];
+int gr_num_line;		/* number of lines read */
+struct GrLine line_array[MAX_NUM_LINE];
+int gr_num_map_files;	/* number of map files */
+struct GrMapLines mapfile[MAX_NUM_MAP];
+
 
 
 /*** function to set constants */

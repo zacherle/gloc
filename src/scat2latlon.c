@@ -40,7 +40,6 @@ tel: +33(0)493752502  e-mail: anthony@alomax.net  web: http://www.alomax.net
  */
 
 
-
 #include <stdio.h>
 #include "GridLib.h"
 
@@ -126,7 +125,10 @@ int ConvertScat(int argc, char** argv) {
     float fdata[4], probmax = -VERY_LARGE_FLOAT;
     double dlat, dlon;
 
-    int nFile, numFiles, nLocWritten, nLocAccepted;
+    int nFile, numFiles;
+//    int nLocWritten;
+    int nLocAccepted;
+
     // make fn_hyp_in_list static to avoid stack overflow problem (F Tilmann) //
     static char fn_hyp_in_list[MAX_NUM_INPUT_FILES][FILENAME_MAX];
     char test_str[10];
@@ -173,7 +175,7 @@ int ConvertScat(int argc, char** argv) {
     }
 
 
-    nLocWritten = 0;
+//    nLocWritten = 0;
     nLocAccepted = 0;
     for (nFile = 0; nFile < numFiles; nFile++) {
 

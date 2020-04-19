@@ -27,7 +27,8 @@ CC=gcc
 
 
 # Linux
-CCFLAGS_BASIC =  -Wall -std=gnu99 ${GRID_FLOAT} -Wno-unused-but-set-variable
+#CCFLAGS_BASIC =  -Wall -std=gnu99 ${GRID_FLOAT} -Wno-unused-but-set-variable
+CCFLAGS_BASIC =  -Wall -std=gnu99 ${GRID_FLOAT}
 #
 #
 # optimized
@@ -222,7 +223,7 @@ scat2latlon.o : scat2latlon.c GridLib.h
 # NLL special compile rule
 #
 
-NLLocLib.o : NLLocLib.c NLLocLib.h GridLib.h
+NLLocLib.o : NLLocLib.c NLLocLib.h GridLib.h velmod.h
 
 GridLib.o : GridLib.c GridLib.h  geometry/geometry.h util.h geo.h octtree/octtree.h alomax_matrix/alomax_matrix.h alomax_matrix/alomax_matrix_svd.h matrix_statistics/matrix_statistics.h ran1/ran1.h map_project.h
 

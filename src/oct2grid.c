@@ -44,18 +44,12 @@ tel: +33(0)493752502  e-mail: anthony@alomax.net  web: http://www.alomax.net
  */
 
 
-
 #include <stdio.h>
 #include "GridLib.h"
 
 #include "util.h"
 #include <stdlib.h>
 #include <string.h>
-
-// defines
-
-
-// globals
 
 
 // functions

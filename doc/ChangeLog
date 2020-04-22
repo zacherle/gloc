@@ -1,3 +1,7 @@
+2020-04-22 v-0.5
+Rename Grid2GMT.c to Grid2GMT4.c 
+New Grid2GMT5.c works with GMT 5 version.
+========================================================================
 2020-04-19 v-0.4
 For global variables stored in library modules (GridLib, GridMemLib,
 velmod, util, NLLocLib, GridGraphLib), define the variable in code
@@ -30,4 +34,4 @@ Call GMT modules via gmt executable.
 ========================================================================
 2020-04-11
 Init repo. Based on the A. Lomax distribution
-http://alomax.free.fr/nlloc/softbeta/tar/NLLbeta_src.tgz of 2018-12-06.
+ittp://alomax.free.fr/nlloc/softbeta/tar/NLLbeta_src.tgz of 2018-12-06.

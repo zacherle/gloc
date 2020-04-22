@@ -1,5 +1,6 @@
 *.o
-src/Grid2GMT
+src/Grid2GMT4
+src/Grid2GMT5
 src/Grid2Time
 src/GridCascadingDecimate
 src/Loc2ddct

@@ -149,11 +149,18 @@ Time2Angles${PVER}.o : Time2Angles${PVER}.c GridLib.h
 # --------------------------------------------------------------------------
 # Grid2GMT
 #
-OBJS4=Grid2GMT.o ${GRID_LIB_OBJS} GridGraphLib.o
-Grid2GMT_ : ${BINDIR}/Grid2GMT
-${BINDIR}/Grid2GMT : ${OBJS4}
-	${CC} ${OBJS4} ${CCFLAGS} -o ${BINDIR}/Grid2GMT -lm
-Grid2GMT.o : Grid2GMT.c GridLib.h GridGraphLib.h
+OBJS44=Grid2GMT4.o ${GRID_LIB_OBJS} GridGraphLib.o
+OBJS45=Grid2GMT5.o ${GRID_LIB_OBJS} GridGraphLib.o
+#
+Grid2GMT_ : ${BINDIR}/Grid2GMT4 ${BINDIR}/Grid2GMT5
+#
+${BINDIR}/Grid2GMT4 : ${OBJS44}
+	${CC} ${OBJS44} ${CCFLAGS} -o ${BINDIR}/Grid2GMT4 -lm
+Grid2GMT4.o : Grid2GMT4.c GridLib.h GridGraphLib.h
+#
+${BINDIR}/Grid2GMT5 : ${OBJS45}
+	${CC} ${OBJS45} ${CCFLAGS} -o ${BINDIR}/Grid2GMT5 -lm
+Grid2GMT5.o : Grid2GMT5.c GridLib.h GridGraphLib.h
 #
 # --------------------------------------------------------------------------
 
@@ -251,7 +258,8 @@ clean :
 
 clean_bin :
 	rm -f ${BINDIR}/Vel2Grid ${BINDIR}/oct2grid ${BINDIR}/NLLoc \
-	${BINDIR}/LocSum ${BINDIR}/Grid2Time ${BINDIR}/Time2Angles ${BINDIR}/Grid2GMT  \
+	${BINDIR}/LocSum ${BINDIR}/Grid2Time ${BINDIR}/Time2Angles  \
+	${BINDIR}/Grid2GMT4 ${BINDIR}/Grid2GMT5  \
 	${BINDIR}/Time2EQ 
 
 #

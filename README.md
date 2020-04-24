@@ -1,4 +1,5 @@
-# NonLinLoc redux
+#GLoc
+**an adaptation of NonLinLoc**
 
 NonLinLoc is a software package popular with seismologists, developed by A. Lomax.
 It is a set of programs for locating earthquakes in 3D structures and for visualizing location results.
@@ -26,3 +27,7 @@ Backward compatibility may be lost during editing.
 ## Documentation
 Documentation of the original program is available on the
 [A. Lomax website](http://alomax.free.fr/nlloc/)
+
+Notes on using the programs can be found at [wiki pages](https://github.com/zacherle/gloc/wiki).
+Comments on the procedures used are on the [web pages](https://zacherle.github.io/gloc) (mostly Czech).
+

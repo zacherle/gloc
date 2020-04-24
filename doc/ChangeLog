@@ -1,3 +1,7 @@
+2020-04-24 v-0.6
+Add web pages.
+docs/{Jekyll files}
+========================================================================
 2020-04-22 v-0.5
 Rename Grid2GMT.c to Grid2GMT4.c 
 New Grid2GMT5.c works with GMT 5 version.

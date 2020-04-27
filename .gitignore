@@ -18,4 +18,5 @@ src/hypoe2hyp
 src/interface2fmm
 src/oct2grid
 src/scat2latlon
-
+docs/.sass-cache/
+docs/_site/

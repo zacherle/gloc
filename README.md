@@ -1,4 +1,4 @@
-#GLoc
+# GLoc
 **an adaptation of NonLinLoc**
 
 NonLinLoc is a software package popular with seismologists, developed by A. Lomax.

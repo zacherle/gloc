@@ -22,6 +22,10 @@ Backward compatibility may be lost during editing.
    Most utilities and marginal programs with little chance of use have been deleted.
 2) Grid2GMT5 works with GMT 5 version. 
    The new MAPLINE GMT_YX_K option is for Krovak map coordinates. 
+3) Programs use many global variables defined in header files.
+   In order to find out which variables require an external link,
+   the variables are defined in the code and declared in the header file
+   library modules GridLib, GridMemLib, velmod, util, NLLocLib, GridGraphLib).
 
 
 ## Documentation
@@ -29,5 +33,5 @@ Documentation of the original program is available on the
 [A. Lomax website](http://alomax.free.fr/nlloc/)
 
 Notes on using the programs can be found at [wiki pages](https://github.com/zacherle/gloc/wiki).
-Comments on the procedures used are on the [web pages](https://zacherle.github.io/gloc) (mostly Czech).
+Comments on the procedures used are on the [web pages](https://zacherle.github.io/gloc).
 

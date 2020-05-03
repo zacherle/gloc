@@ -241,8 +241,13 @@
     }
 }
 
-.center-image
-{
+.center-image img {
     margin: 0 auto;
-    display: block;
+    position: relative;
+}
+
+.center-image figcaption {
+    margin: 0 auto;
+    position: relative;
+    text-align: center;
 }

@@ -25,7 +25,7 @@ Backward compatibility may be lost during editing.
 3) Programs use many global variables defined in header files.
    In order to find out which variables require an external link,
    the variables are defined in the code and declared in the header file
-   library modules GridLib, GridMemLib, velmod, util, NLLocLib, GridGraphLib).
+   (library modules GridLib, GridMemLib, velmod, util, NLLocLib, GridGraphLib).
 
 
 ## Documentation

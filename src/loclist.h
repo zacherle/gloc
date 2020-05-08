@@ -1,3 +1,6 @@
+#ifndef LOCLIST_H
+#define LOCLIST_H
+
 /*
  * Copyright (C) 1999-2010 Anthony Lomax <anthony@alomax.net, http://www.alomax.net>
  *
@@ -17,9 +20,9 @@
  */
 
 
-/*  phaseloclist.h
+/*  loclist.h
 
-	include file for phaselist and loclist
+	include file for loclist
 
 */
 
@@ -32,33 +35,7 @@ Anthony Lomax Scientific Software
 tel: +33(0)493752502  e-mail: anthony@alomax.net  web: http://www.alomax.net
 -------------------------------------------------------------------------*/
 
-//depend: #include "GridLib.h"
-
-
-/* misc defines */
-
-#ifndef SMALL_DOUBLE
-#define SMALL_DOUBLE 1.0e-20
-#endif
-#ifndef LARGE_DOUBLE
-#define LARGE_DOUBLE 1.0e20
-#endif
-#ifndef VERY_SMALL_DOUBLE
-#define VERY_SMALL_DOUBLE 1.0e-30
-#endif
-#ifndef VERY_LARGE_DOUBLE
-#define VERY_LARGE_DOUBLE 1.0e30
-#endif
-
-
-#define INVALID_DOUBLE -VERY_LARGE_DOUBLE
-
-#define INIT_NUM_ASSOC_LOC_PER_PHASE 8
-
-#define MAX_NUM_LOCATIONS 1000
-#define MAX_NUM_PHASES_PER_LOC 4096
-
-#define DUPLICATE_PAHSE_FOUND ((PhsNode *) -9876)
+#include "GridLib.h"
 
 
 
@@ -66,25 +43,6 @@ tel: +33(0)493752502  e-mail: anthony@alomax.net  web: http://www.alomax.net
 /* structures */
 /*------------------------------------------------------------/ */
 
-
-/* phaselist */
-
-/* phaselist node */
-
-typedef struct phasenode
-{
-	struct phasenode *prev;	/* pointer to previous vertex */
-	struct phasenode *next;	/* pointer to next vertex */
-	int id;			/* vertex identification */
-	double phase_time;	/* phase time in seconds - sort value */
-	ArrivalDesc* parrival;	/* phase arrival data (observation part only is initialized) */
-	int *passoc_locations;	/* id's of associated locations, -1 if none */
-	int passoc_locations_size;	/* size of passoc_locations array */
-} PhsNode;
-
-
-
-/* loclist */
 
 /* location structure */
 
@@ -123,27 +81,6 @@ typedef struct locnode
 /* function declarations */
 /*------------------------------------------------------------/ */
 
-/* phaselist */
-
-PhsNode *addArrivalToPhaseList(PhsNode **phead, ArrivalDesc* parrival, int id, int addDuplicates);
-PhsNode *addPhsNodeToPhaseList(PhsNode *phead, PhsNode* addr);
-PhsNode *removeArrivalFromPhaseList(PhsNode *head, PhsNode* addr, int freeArrivalDesc);
-int freePhaseList(PhsNode *head, int freeArrivalDesc);
-PhsNode *addNLLPhaseStringToPhaseList(PhsNode **phead, char *phase_string, int id, int addDuplicates);
-int writePhaseList(PhsNode *head, FILE *out);
-double getPhaseTimeValue(ArrivalDesc *parrival);
-int compareTimeValue(double t1, double t2);
-int addRemoveLocationInAssocLocationsList(PhsNode *addr, int locID, int addLocID);
-int updateAssociatedLocation(PhsNode *head, Location *plocation, int locID, double tmin, double tmax);
-PhsNode *findPhaseInTimeWindow(PhsNode *head, double tmin, double tmax, int associatedFlag);
-PhsNode *findPhase(PhsNode *head, ArrivalDesc *arrivalKey);
-int compareArrivals(ArrivalDesc *parrival, ArrivalDesc *arrivalKey, int compareTimes);
-int strcmp_to_null(char *s1, char *s2);
-// AJL 20070323-
-PhsNode *getPhsNodeFromPhaseList(PhsNode *head, int id);
-int removeLocationAssociation(PhsNode *head, int locID, double tmin_nomimnal, double tmax_nomimnal);
-
-
 /* loclist */
 
 Location *newLocation(HypoDesc *phypo, ArrivalDesc* parrivals, int narrivals, GridDesc *pgrid, Tree3D* poctTree, float *pscatterSample);
@@ -166,3 +103,4 @@ LocNode *getLocationFromLocList(LocNode *head, int id);
 /*------------------------------------------------------------/ */
 
 
+#endif //LOCLIST_H

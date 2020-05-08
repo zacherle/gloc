@@ -12,11 +12,12 @@
 
 
 
-#include "../geometry/geometry.h"
 #include "matrix_statistics.h"
+#include "../geometry/geometry.h"
 
 #include "../vector/vector.h"
-#include "../alomax_matrix/alomax_matrix.h"
+#include "../alomax_matrix/alomax_matrix_svd.h"
+
 #include <stdio.h>
 #include <float.h>
 #include <math.h>

@@ -42,9 +42,9 @@ tel: +33(0)493752502  e-mail: anthony@alomax.net  web: http://www.alomax.net
  */
 
 
-#include <stdio.h>
-#include "../geometry/geometry.h"
 #include "octtree.h"
+#include "../geometry/geometry.h"
+#include <stdio.h>
 
 #include "../ran1/ran1.h"
 #include <stdlib.h>
@@ -52,6 +52,58 @@ tel: +33(0)493752502  e-mail: anthony@alomax.net  web: http://www.alomax.net
 #include <math.h>
 #include <limits.h>
 #include <time.h>
+
+/*------------------------------------------------------------/ */
+/* function declarations */
+/*------------------------------------------------------------/ */
+
+Tree3D* newTree3D(int data_code, int numx, int numy, int numz,
+	double origx, double origy, double origz,
+	double dx,  double dy,  double dz, double value, double integral, void *pdata);
+Tree3D* newTree3D_spherical(int data_code, int numx_nominal, int numy, int numz,
+        double origx, double origy, double origz,
+        double dx_nominal, double dy, double dz, double value, double integral, void *pdata);
+double get_dx_spherical(double dx_nominal, double origx, double x_max, double center_y, int *pnum_x);
+OctNode* newOctNode(OctNode* parent, Vect3D center, Vect3D ds, double value, void *pdata);
+void subdivide(OctNode* parent, double value, void *pdata);
+void freeTree3D(Tree3D* tree, int freeDataPointer);
+void freeNode(OctNode* node, int freeDataPointer);
+OctNode* getTreeNodeContaining(Tree3D* tree, Vect3D coords);
+OctNode* getLeafNodeContaining(Tree3D* tree, Vect3D coords);
+OctNode* getLeafContaining(OctNode* node, double x, double y, double z);
+
+ResultTreeNode* addResult(ResultTreeNode* prtn, double value, double volume, OctNode* pnode);
+void freeResultTree(ResultTreeNode* prtn);
+ResultTreeNode* getHighestValue(ResultTreeNode* prtn);
+ResultTreeNode* getHighestLeafValue(ResultTreeNode* prtree);
+ResultTreeNode* getHighestLeafValueMinSize(ResultTreeNode* prtree, double sizeMinX, double sizeMinY, double sizeMinZ);
+ResultTreeNode* getHighestLeafValueLESpecifiedSize(ResultTreeNode* prtree, double sizeX, double sizeY, double sizeZ);
+ResultTreeNode* getHighestLeafValueOfSpecifiedSize(ResultTreeNode* prtree, double sizeX, double sizeY, double sizeZ);
+ResultTreeNode* getHighestLeafValueAtSpecifiedLevel(ResultTreeNode* prtree, int level);
+ResultTreeNode* getHighestLeafValueLESpecifiedLevel(ResultTreeNode* prtree, int level);
+ResultTreeNode* getHighestLeafValueGESpecifiedLevel(ResultTreeNode* prtree, int level);
+
+Tree3D* readTree3D(FILE *fpio);
+int readNode(FILE *fpio, OctNode* node);
+int writeTree3D(FILE *fpio, Tree3D* tree);
+int writeNode(FILE *fpio, OctNode* node);
+
+int nodeContains(OctNode* node, double x, double y, double z);
+int extendedNodeContains(OctNode* node, double x, double y, double z, int checkZ);
+
+int getScatterSampleResultTreeAtLevels(ResultTreeNode* prtree, int value_type, int num_scatter,
+        double integral, float* fdata, int npoints, int* pfdata_index,
+        double oct_node_value_ref, double *poct_tree_scatter_volume, int level_min, int level_max);
+int getScatterSampleResultTree(ResultTreeNode* prtree, int value_type, int num_scatter,
+        double integral, float* fdata, int npoints, int* pfdata_index,
+        double oct_node_value_max, double *poct_tree_scatter_volume);
+double convertOcttreeValuesToProb(ResultTreeNode* prtree, double sum, double oct_node_value_max);
+double integrateResultTreeAtLevels(ResultTreeNode* prtree, int value_type, double sum, double oct_node_value_max, int level_min, int level_max);
+double integrateResultTree(ResultTreeNode* prtree, int value_type, double sum, double oct_node_value_max);
+ResultTreeNode* createResultTree(ResultTreeNode* prtree, ResultTreeNode* pnew_rtree);
+
+/*------------------------------------------------------------/ */
+
 
 /*** function to create a new OctNode */
 

@@ -4,13 +4,12 @@
  *
  */
 
-#include <stdlib.h>
-//#include <stdio.h>
-//#include <string.h>
-#include <math.h>
-//#include <float.h>
-#include "alomax_matrix.h"
 #include "alomax_matrix_svd.h"
+
+#include "alomax_matrix.h"
+
+#include <stdlib.h>
+#include <math.h>
 
 
 #define Math_min(A,B) ((B)<(A)?(B):(A))
@@ -625,5 +624,38 @@ int svd_rank() {
 }
 
 
+
+
+/**
+ *  Helper function to apply singular value decomposition
+ *
+ * input:
+ *    a_matrix - num_rows x num_cols matrix to which to apply svs
+ *
+ * output:
+ *   s_vector - vector of singular values of size num_cols)
+ *   v_matrix - orthogonal matrix of right singular vectors of size num_columns x num_columns
+ *
+ */
+
+void svd_helper(MatrixDouble A_matrix, int num_rows, int num_cols, VectorDouble S_vector, MatrixDouble V_matrix) {
+
+    SingularValueDecomposition(A_matrix, num_rows, num_cols);
+    VectorDouble s_vector = svd_getSingularValues();
+    MatrixDouble v_matrix = svd_getV();
+
+    int i, j;
+    for (i = 0; i < num_rows; i++) {
+        for (j = 0; j < num_cols; j++) {
+            V_matrix[i][j] = v_matrix[i][j];
+        }
+    }
+    for (j = 0; j < num_cols; j++) {
+        S_vector[j] = s_vector[j];
+    }
+
+    clean_SingularValueDecomposition();
+
+}
 
 

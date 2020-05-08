@@ -1,3 +1,6 @@
+#ifndef ALOMAX_MATRIX_H
+#define ALOMAX_MATRIX_H
+
 /*
  * Written by Anthony Lomax <anthony@alomax.net, http://www.alomax.net>
  *
@@ -5,7 +8,6 @@
  *
  */
 
-//depend: no
 
 typedef double**  MatrixDouble;
 typedef double*  VectorDouble;
@@ -25,5 +27,7 @@ int matrix_double_inverse(MatrixDouble dmtx, int num_rows, int num_cols);
 int matrix_double_check_diagonal_non_zero_inverse(MatrixDouble mtx_original, int i_original_size, int verify_inverse, int verbose);
 int square_inverse_not_ok(MatrixDouble inverse_mtrx, MatrixDouble original_mtx, int nsize, int verbose);
 
-void svd_helper(MatrixDouble A_matrix, int num_rows, int num_cols, VectorDouble S_vector, MatrixDouble V_matrix);
+//void svd_helper(MatrixDouble A_matrix, int num_rows, int num_cols, VectorDouble S_vector, MatrixDouble V_matrix);
 int real_symmetric_eigen_helper(MatrixDouble A_matrix, int isize, VectorDouble S_vector, MatrixDouble V_matrix);
+
+#endif //ALOMAX_MATRIX_H

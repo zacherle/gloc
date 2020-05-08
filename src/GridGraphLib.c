@@ -23,9 +23,9 @@
 
 */
 
+#include "GridGraphLib.h"
 #include <stdio.h>
 #include "GridLib.h"
-#include "GridGraphLib.h"
 
 #include "util.h"
 #include <stdlib.h>

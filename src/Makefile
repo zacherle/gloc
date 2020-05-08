@@ -23,6 +23,7 @@ GRID_FLOAT=
 
 
 CC=gcc
+#CC=clang
 #
 
 
@@ -46,8 +47,6 @@ export CCFLAGS = -O3 $(CCFLAGS_BASIC)
 # valgrind --leak-check=full --show-reachable=yes exe_name <args>
 
 
-# Custom builds
-#
 # GNU
 #GNU_SOURCE=-D _GNU_SOURCE
 # IMPORTANT: use following if the compiler you are using does not support GNU extensions such as:
@@ -74,16 +73,9 @@ dev : ${DISTRIB_SOURCES}
 # --------------------------------------------------------------------------
 # NLLoc
 #
-OBJS0=NLLocLib.o ${GRID_LIB_OBJS} ${NLLOC_LIB_OBJS}
-OPTIONS0= $(GNU_SOURCE)
-# Custom builds
-ifeq ($(CUSTOM), ETH)
-	OBJS1=$(OBJS0) eth_functions.o get_region_name_nr.o magnitude.o new_sedlib.o complex.o
-	OPTIONS=$(OPTIONS0) -D CUSTOM_ETH
-else
-	OBJS1=$(OBJS0)
-	OPTIONS=$(OPTIONS0)
-endif
+OBJS1=NLLocLib.o ${GRID_LIB_OBJS} ${NLLOC_LIB_OBJS}
+OPTIONS= $(GNU_SOURCE)
+
 PVER=1
 # --------------------------------------------------------------------------
 # NLLoc general
@@ -238,9 +230,9 @@ GridMemLib.o : GridMemLib.c GridMemLib.h  GridLib.h
 
 GridGraphLib.o : GridGraphLib.c GridLib.h GridGraphLib.h
 
-phaselist.o : phaselist.c phaseloclist.h  GridLib.h
+phaselist.o : phaselist.c phaselist.h  GridLib.h
 
-loclist.o : loclist.c phaseloclist.h  GridLib.h
+loclist.o : loclist.c loclist.h  GridLib.h
 
 otime_limit.o : otime_limit.c otime_limit.h
 

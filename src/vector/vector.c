@@ -23,9 +23,9 @@
 	Nov 1992
 */
 
+#include "vector.h"
 
 #include <math.h>
-#include "vector.h"
 
 /*** function to calculate dot product of 3-D vectors (A o B) */
 

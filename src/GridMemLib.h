@@ -1,6 +1,8 @@
+#ifndef GRIDMEMLIB_H
+#define GRIDMEMLIB_H
 
-//depend: #include "GridLib.h"
 
+#include "GridLib.h"
 
 /*------------------------------------------------------------*/
 /** grid memory management routines */
@@ -43,4 +45,4 @@ int GridMemList_NumElements();
 /** end of grid memory management routines */
 /*------------------------------------------------------------*/
 
-
+#endif //GRIDMEMLIB_H

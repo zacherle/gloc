@@ -48,7 +48,7 @@ tel: +33(0)493752502  e-mail: anthony@alomax.net  web: http://www.alomax.net
 #include <stdio.h>
 #include "GridLib.h"
 #include "velmod.h"
-#include "phaseloclist.h"
+#include "loclist.h"
 #include "otime_limit.h"
 #include "alomax_matrix/alomax_matrix.h"
 #include "NLLocLib.h"

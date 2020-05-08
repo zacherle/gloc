@@ -1,18 +1,18 @@
-//	geo.h
+#ifndef GEO_H
+#define GEO_H
+
 //
 // Adapted from:
 //    Geographic Distance and Azimuth Calculations
 //    by Andy McGovern
 //    http://www.codeguru.com/algorithms/GeoCalc.html
 
-//#ifndef GEO_CALCULATIONS_H_
-//#define GEO_CALCULATIONS_H_
 
   //
   // some geo constants
   //
 
-//depend: #include <math.h>
+#include <math.h>
 
 // 20171122 AJL  #define PI 3.14159265359
 #define PI M_PI
@@ -48,3 +48,5 @@ double EllipsoidAzimuth(double lat1, double lon1, double lat2, double lon2);
 double ApproxAzimuth(double lat1, double lon1, double lat2, double lon2);
 
 void PointAtGCDistanceAzimuth(double lat1, double lon1, double dist, double az, double* lat2, double* lon2);
+
+#endif //GEO_H

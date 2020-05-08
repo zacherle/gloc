@@ -1,6 +1,6 @@
+#ifndef MAP_PROJECT
+#define MAP_PROJECT
 
-
-//depend: no
 
 int map_setup_proxy(int n_proj, char* ellipsoid_name);
 
@@ -24,3 +24,4 @@ void vazeqdist(int n_proj, double lon0, double lat0);
 void azeqdist(int n_proj, double lon, double lat, double *x, double *y);
 void iazeqdist(int n_proj, double *lon, double *lat, double x, double y);
 
+#endif //MAP_PROJECT

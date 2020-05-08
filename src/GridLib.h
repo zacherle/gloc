@@ -1,3 +1,6 @@
+#ifndef GRIDLIB_H
+#define GRIDLIB_H
+
 /*
  * Copyright (C) 1999-2015 Anthony Lomax <anthony@alomax.net, http://www.alomax.net>
  *
@@ -38,12 +41,11 @@ www.alomax.net
 #define PCOPYRIGHT "\0"
 
 
-//depend: #include <stdio.h>
-
 #include "geometry/geometry.h"
 #include "matrix_statistics/matrix_statistics.h"
 #include "octtree/octtree.h"
 
+#include <stdio.h>
 
 // 20100614 AJL -
 // the following sets globally the float size (float or double) for NLL grids - modify with care!
@@ -877,3 +879,4 @@ int WriteDiffArrival(FILE* fpio, HypoDesc* hypos, ArrivalDesc* parr, int iWriteT
 /*------------------------------------------------------------/ */
 
 
+#endif //GRIDLIB_H

@@ -1,3 +1,6 @@
+#ifndef MATRIX_STATISTICS_H
+#define MATRIX_STATISTICS_H
+
 /***************************************************************************
  * matrix_statistics.h:
  *
@@ -10,7 +13,7 @@
  ***************************************************************************/
 
 
-//depend: #include "../geometry/geometry.h"
+#include "../geometry/geometry.h"
 
 
 #define CONFIDENCE_LEVEL 68.0   // 68% confidence level used throughout
@@ -58,3 +61,6 @@ int nllEllipsiod2QMLConfidenceEllipsoid(Ellipsoid3D *pellipsoid,
         double* pmajorAxisAzimuth,
         double* pmajorAxisPlunge,
         double* pmajorAxisRotation);
+
+
+#endif //MATRIX_STATISTICS_H

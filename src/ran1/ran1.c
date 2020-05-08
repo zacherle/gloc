@@ -4,6 +4,8 @@
 #include <stdlib.h>
 #include <stdio.h>
 
+double uni(void);
+void rstart(int i, int j, int k, int l);
 
 int RanSeed;
 

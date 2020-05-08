@@ -1,3 +1,5 @@
+#ifndef VELMOD_H
+#define VELMOD_H
 /*
  * Copyright (C) 1999-2010 Anthony Lomax <anthony@alomax.net, http://www.alomax.net>
  *
@@ -19,14 +21,8 @@
 
 /* velmod.h include file */
 
-/* 	History:
 
-        see wls.c
-
- */
-
-
-//depend: #include <stdio.h>
+#include <stdio.h>
 
 
 #define MAXFILE 200
@@ -427,3 +423,4 @@ int draw_time_axis();
 
 double get_fdiff_vel(double xpos, double zpos, char wavetype, double *density, int iden);
 
+#endif //VELMOD_H

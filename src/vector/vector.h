@@ -1,3 +1,6 @@
+#ifndef VECTOR_H
+#define VECTOR_H
+
 /*
  * Copyright (C) 1999-2010 Anthony Lomax <anthony@alomax.net, http://www.alomax.net>
  *
@@ -28,3 +31,5 @@ double dot_product_3d();
 int cross_product_3d();		    
 double magnitude_3d();		    
 int cross_product_3d(double a1, double a2, double a3, double b1, double b2, double b3, double *p1, double *p2, double *p3);
+
+#endif //VECTOR_H

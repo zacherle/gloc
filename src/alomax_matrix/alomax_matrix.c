@@ -7,13 +7,14 @@
 
 #include "alomax_matrix.h"
 
+#include "eigv.h"
+
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
 #include <math.h>
 #include <float.h>
-#include "alomax_matrix_svd.h"
-#include "eigv.h"
+
 
 //#define EPSILON_BIG  (1.0e-5)
 //#define EPSILON_BIG  (1.0e-3)
@@ -425,37 +426,6 @@ int square_inverse_not_ok(MatrixDouble inverse_mtrx, MatrixDouble original_mtx, 
 #undef EPSILON
 #undef EPSILON_BIG
 
-/**
- *  Helper function to apply singular value decomposition
- *
- * input:
- *    a_matrix - num_rows x num_cols matrix to which to apply svs
- *
- * output:
- *   s_vector - vector of singular values of size num_cols)
- *   v_matrix - orthogonal matrix of right singular vectors of size num_columns x num_columns
- *
- */
-
-void svd_helper(MatrixDouble A_matrix, int num_rows, int num_cols, VectorDouble S_vector, MatrixDouble V_matrix) {
-
-    SingularValueDecomposition(A_matrix, num_rows, num_cols);
-    VectorDouble s_vector = svd_getSingularValues();
-    MatrixDouble v_matrix = svd_getV();
-
-    int i, j;
-    for (i = 0; i < num_rows; i++) {
-        for (j = 0; j < num_cols; j++) {
-            V_matrix[i][j] = v_matrix[i][j];
-        }
-    }
-    for (j = 0; j < num_cols; j++) {
-        S_vector[j] = s_vector[j];
-    }
-
-    clean_SingularValueDecomposition();
-
-}
 
 /**
  *  Helper function to apply real symmetric eigen decomposition

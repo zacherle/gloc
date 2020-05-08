@@ -1,3 +1,6 @@
+#ifndef NLLOCLIB_H
+#define NLLOCLIB_H
+
 /*
  * Copyright (C) 1999-2010 Anthony Lomax <anthony@alomax.net, http://www.alomax.net>
  *
@@ -32,11 +35,11 @@ tel: +33(0)493752502  e-mail: anthony@alomax.net  web: http://www.alomax.net
  */
 
 
-//depend: #include "GridLib.h"
-//        #include "velmod.h"
-//        #include "phaseloclist.h"
-//        #include "otime_limit.h"
-//        #include "alomax_matrix/alomax_matrix.h"
+#include "GridLib.h"
+#include "velmod.h"
+#include "loclist.h"
+#include "otime_limit.h"
+#include "alomax_matrix/alomax_matrix.h"
 
 
 
@@ -542,3 +545,4 @@ int GetElevCorr(char* line1);
 
 /*------------------------------------------------------------*/
 
+#endif //NLLOCLIB_H

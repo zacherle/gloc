@@ -1,13 +1,12 @@
-//	geo.cpp
 //
 // Adapted from:
 //    Geographic Distance and Azimuth Calculations
 //    by Andy McGovern
 //    http://www.codeguru.com/algorithms/GeoCalc.html
 
-#include <math.h>
 #include "geo.h"
 
+#include <math.h>
 #include <float.h>
 
 double GCDistance(double lat1, double lon1, double lat2, double lon2) {

@@ -40,13 +40,28 @@ tel: +33(0)493752502  e-mail: anthony@alomax.net  web: http://www.alomax.net
 
 
 
-#include <stdio.h>
+#include "loclist.h"
 #include "GridLib.h"
-#include "phaseloclist.h"
+#include <stdio.h>
 
+#include "phaselist.h"
 #include <time.h>
 #include <limits.h>
 #include <stdlib.h>
+
+/* misc defines */
+
+#ifndef LARGE_DOUBLE
+#define LARGE_DOUBLE 1.0e20
+#endif
+#ifndef VERY_LARGE_DOUBLE
+#define VERY_LARGE_DOUBLE 1.0e30
+#endif
+
+
+#define INVALID_DOUBLE -VERY_LARGE_DOUBLE
+
+#define MAX_NUM_LOCATIONS 1000
 
 
 /** function to create a new LocNode from a NLL HypoDesc structure - sorted by id */

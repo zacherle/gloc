@@ -1,3 +1,6 @@
+#ifndef _OTIME_LIMIT_H
+#define	_OTIME_LIMIT_H
+
 /* 
  * File:   otime_limit.h
  * Author: anthony
@@ -5,10 +8,6 @@
  * Created on 14 September 2009, 15:52
  */
 
-//depend: no
-
-#ifndef _OTIME_LIMIT_H
-#define	_OTIME_LIMIT_H
 
 #ifdef	__cplusplus
 extern "C" {
@@ -39,5 +38,4 @@ void free_OtimeLimit(OtimeLimit* otime_limit);
 }
 #endif
 
-#endif	/* _OTIME_LIMIT_H */
-
+#endif	//_OTIME_LIMIT_H

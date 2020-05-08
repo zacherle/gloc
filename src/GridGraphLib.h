@@ -1,3 +1,6 @@
+#ifndef GRIDGRAPHLIB_H
+#define GRIDGRAPHLIB_H
+
 /* 
  * Copyright (C) 1999 Anthony Lomax <lomax@faille.unice.fr>
  *
@@ -33,8 +36,8 @@
 /*------------------------------------------------------------/ */
 
 
-//depend: #include <stdio.h>
-//        #include "GridLib.h"
+#include "GridLib.h"
+#include <stdio.h>
 
 
 /*------------------------------------------------------------/ */
@@ -138,4 +141,4 @@ Vect2D*  Vect3D2To2D(Vect3D *, Vect2D* , int , int );
 /* */
 /*------------------------------------------------------------/ */
 
-
+#endif //GRIDGRAPHLIB_H

@@ -1,3 +1,6 @@
+#ifndef UTIL_H
+#define UTIL_H
+
 /*
  * Copyright (C) 1999-2010 Anthony Lomax <anthony@alomax.net, http://www.alomax.net>
  *
@@ -29,7 +32,6 @@
 	Geosciences Azur, Valbonne, France
 */
 
-//depend: no
 
 #ifndef MAXLINE
 #define MAXLINE 101
@@ -75,3 +77,4 @@ int checkRangeInt(const char * name, const char * param, int val,
 int checkRangeDouble(const char * name, const char * param, double val,
 	int checkMin, double min, int checkMax, double max);
 
+#endif //UTIL_H

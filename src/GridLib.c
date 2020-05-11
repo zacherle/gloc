@@ -236,23 +236,6 @@ int get_control(char* line1) {
 
 }
 
-/** function to read output file name ***/
-
-int get_outfile(char* line1) {
-
-    int istat;
-
-    istat = sscanf(line1, "%s", fn_output);
-
-    sprintf(MsgStr, "OUTPUT FILES: %s.*", fn_output);
-    nll_putmsg(3, MsgStr);
-
-    if (istat != 1)
-        return (-1);
-
-    return (0);
-}
-
 /** function to read include file name and reset input to include file ***/
 
 int GetIncludeFile(char* line1, FILE **fp_io) {
@@ -1297,20 +1280,6 @@ void FreeGrid(GridDesc * pgrid) {
     }
 }
 
-/** function to initialize buffer for 3D grid ***/
-
-int InitializeGrid(GridDesc* pgrid, GRID_FLOAT_TYPE init_value) {
-
-    GRID_FLOAT_TYPE *gbuf;
-
-    gbuf = (GRID_FLOAT_TYPE *) pgrid->buffer + pgrid->numx * pgrid->numy * pgrid->numz;
-
-    while (gbuf-- > (GRID_FLOAT_TYPE *) pgrid->buffer)
-        *gbuf = init_value;
-
-    return (0);
-}
-
 /** function to create array for accessing 3D grid ***/
 
 void*** CreateGridArray(GridDesc * pgrid) {
@@ -1451,51 +1420,6 @@ int CheckGridArray(GridDesc* pgrid, double gridMax, double gridMaxReplace,
     return (ierror);
 }
 
-
-
-
-/** function to sum 2 grids ***/
-
-/* reads from  array if fp_grid_new == NULL */
-
-//#define DEBUG_SUMGRIDS
-
-int SumGrids(GridDesc* pgrid_sum, GridDesc* pgrid_new, FILE* fp_grid_new, double factor) {
-
-    int ix, iy, iz;
-    GRID_FLOAT_TYPE xval, yval, zval, newval;
-
-    xval = pgrid_sum->origx;
-    for (ix = 0; ix < pgrid_sum->numx; ix++) {
-
-        yval = pgrid_sum->origy;
-        for (iy = 0; iy < pgrid_sum->numy; iy++) {
-
-            zval = pgrid_sum->origz;
-            for (iz = 0; iz < pgrid_sum->numz; iz++) {
-
-                if ((newval = ReadAbsInterpGrid3d(fp_grid_new, pgrid_new, xval, yval, zval, 0)) > -LARGE_FLOAT) {
-#ifdef DEBUG_SUMGRIDS
-                    float result = ((GRID_FLOAT_TYPE ***) pgrid_sum->array)[ix][iy][iz] + factor * newval;
-                    if (factor < 0.0 && fabs(result) > 1.0)
-                        printf("DEBUG: SumGrids: %d %d %d  %f + %f * %f = %f\n",
-                            ix, iy, iz, ((GRID_FLOAT_TYPE ***) pgrid_sum->array)[ix][iy][iz], factor, newval, result);
-#endif
-                    ((GRID_FLOAT_TYPE ***) pgrid_sum->array)[ix][iy][iz] += factor * newval;
-                }
-
-                zval += pgrid_sum->dz;
-            }
-
-            yval += pgrid_sum->dy;
-        }
-
-        xval += pgrid_sum->dx;
-    }
-
-
-    return (0);
-}
 
 
 
@@ -1775,21 +1699,6 @@ double GetEpiAzimSta(StationDesc* psta, double xval, double yval) {
 
 /** function to calculate distance between 2 XYZ points */
 
-double Dist2D(double x1, double x2, double y1, double y2) {
-
-    if (GeometryMode == MODE_GLOBAL) {
-        return (GCDistance(y1, x1, y2, x2));
-        //return(EllipsoidDistance(yval, xval, psta->y, psta->x));
-    } else {
-        double dx, dy;
-        dx = x1 - x2;
-        dy = y1 - y2;
-        return (sqrt(dx * dx + dy * dy));
-    }
-}
-
-/** function to calculate distance between 2 XYZ points */
-
 double Dist3D(double x1, double x2, double y1, double y2,
         double z1, double z2) {
     double dx, dy, dz;
@@ -2060,88 +1969,6 @@ int ReadGrid3dBufSheet(GRID_FLOAT_TYPE* sheetbuf, GridDesc* pgrid_disk,
 
     if (pgrid_disk->iSwapBytes)
         swapBytes(sheetbuf, readsize / sizeof (GRID_FLOAT_TYPE));
-
-    return (0);
-}
-
-/** function to read grid header file ***/
-
-int ReadGrid3dHdr(GridDesc* pgrid, SourceDesc* psrce, char* filename, char* file_type) {
-
-    FILE *fpio;
-    char fname[FILENAME_MAX];
-
-
-
-    /* read header file */
-
-    sprintf(fname, "%s.%s.hdr", filename, file_type);
-    if ((fpio = fopen(fname, "r")) == NULL) {
-        if (message_flag >= 1)
-            nll_puterr2("ERROR: opening grid header file: %s", fname);
-        return (-1);
-    }
-    NumFilesOpen++;
-
-
-    if (ReadGrid3dHdr_grid_description(fpio, pgrid, fname) < 0) {
-        fclose(fpio);
-        NumFilesOpen--;
-        return (-1);
-    }
-
-    if (strncmp(file_type, "time", 4) == 0
-            || strncmp(file_type, "angle", 4) == 0)
-        fscanf(fpio, "%s %lf %lf %lf\n",
-            psrce->label, &(psrce->x), &(psrce->y), &(psrce->z));
-
-
-    //  check for optional header lines
-    char line[MAXLINE_LONG];
-    char tag[MAXLINE_LONG];
-
-    // check for map projection
-    strcpy(pgrid->mapProjStr, "");
-    rewind(fpio);
-    while (fgets(line, MAXLINE_LONG, fpio) != NULL) {
-        int istat = sscanf(line, "%s", tag);
-        if (istat == 1 && strcmp(tag, "TRANSFORM") == 0) {
-            strcpy(pgrid->mapProjStr, line);
-        }
-    }
-
-    // check if cascading grid
-    pgrid->flagGridCascading = IS_NOT_CASCADING;
-    int num_z_merge_depths;
-    rewind(fpio);
-    while (fgets(line, MAXLINE_LONG, fpio) != NULL) {
-        int istat = sscanf(line, "%s %d", tag, &num_z_merge_depths);
-        if (istat == 2 && strcmp(tag, "CASCADING_GRID") == 0) {
-            setCascadingGrid(pgrid);
-            pgrid->gridDesc_Cascading.num_z_merge_depths = num_z_merge_depths;
-            if (pgrid->gridDesc_Cascading.num_z_merge_depths > MAX_NUM_Z_MERGE_DEPTHS) {
-                pgrid->gridDesc_Cascading.num_z_merge_depths = MAX_NUM_Z_MERGE_DEPTHS;
-                sprintf(MsgStr, "ERROR: too many cascading grid Z merge depths, only using first %d depths.",
-                        pgrid->gridDesc_Cascading.num_z_merge_depths);
-                nll_puterr(MsgStr);
-            }
-            // 20170207 AJL - z_merge_depths moved to fixed array to ease memory management
-            //pgrid->gridDesc_Cascading.z_merge_depths = (double*) malloc((size_t) num_z_merge_depths * sizeof (double));
-            char doubling_depths[1024];
-            sscanf(line, "%*s %*d %s", doubling_depths);
-            char *str_pos = strtok(doubling_depths, ",");
-            int n = 0;
-            while (str_pos != NULL) {
-                pgrid->gridDesc_Cascading.z_merge_depths[n] = atof(str_pos);
-                //printf("DEBUG: CASCADING_GRID doubling depth added: %s %f\n", str_pos, pgrid->gridDesc_Cascading.z_merge_depths[n]);
-                n++;
-                str_pos = strtok(NULL, ",");
-            }
-        }
-    }
-
-    fclose(fpio);
-    NumFilesOpen--;
 
     return (0);
 }
@@ -2641,43 +2468,6 @@ cleanup:
     return (value);
 }
 
-/** function to read cascading grid data from disk or array at upper xyz indices corresponding to regular grid index location
- *
- * 20161019 AJL - added
- *
- *  ix, iy, iz are indices in virtual, regular grid equivalent to this cascading grid
- */
-
-GRID_FLOAT_TYPE ReadGrid3dValue_Cascading(FILE *fpgrid, int ix, int iy, int iz, GridDesc * pgrid) {
-
-    // check indexes in range
-    // ix, iy, iz are indices in virtual, regular grid equivalent to this cascading grid
-    if (ix < 0 || ix >= pgrid->numx || iy < 0 || iy >= pgrid->numy || iz < 0 || iz >= pgrid->numz) {
-        //nll_puterr("WARNING: grid file index out of range.");
-        return (-VERY_LARGE_FLOAT);
-    }
-
-    // need grid array to find offset
-    if (pgrid->array == NULL) {
-        if (pgrid->buffer == NULL) {
-            // prepare grid memory without allocating buffer, required to initialize cascading grid array
-            AllocateGrid_Cascading(pgrid, 0);
-        }
-        pgrid->array = CreateGridArray_Cascading(pgrid);
-    }
-
-    // set x,y,z indices in cascading grid
-    int iz_casc = pgrid->gridDesc_Cascading.zindex[iz];
-    int ix_casc = ix / pgrid->gridDesc_Cascading.xyz_scale[iz];
-    int iy_casc = iy / pgrid->gridDesc_Cascading.xyz_scale[iz];
-
-
-    // get fvalue
-    GRID_FLOAT_TYPE fvalue = ReadCascadingGrid3dValue(fpgrid, ix_casc, iy_casc, iz_casc, pgrid);
-
-    return (fvalue);
-}
-
 /** function to read grid data from disk or array at index location ***/
 
 GRID_FLOAT_TYPE ReadGrid3dValue(FILE *fpgrid, int ix, int iy, int iz, GridDesc * pgrid, int clean_casc_allocs) {
@@ -3165,19 +2955,6 @@ int WriteLocation(FILE *fpio, HypoDesc* phypo, ArrivalDesc* parrivals,
             narrivals, filename,
             iWriteArrivals, iWriteEndLoc, iWriteMinimal,
             pgrid, n_proj, IO_ARRIVAL_ALL));
-}
-
-/** function to write arrivals to output */
-
-int WritePhases(FILE *fpio, HypoDesc* phypo, ArrivalDesc* parrivals,
-        int narrivals, char* filename,
-        int iWriteArrivals, int iWriteEndLoc, int iWriteMinimal,
-        GridDesc* pgrid, int n_proj, int io_arrival_mode) {
-
-    return (_WriteLocation(fpio, phypo, parrivals,
-            narrivals, filename,
-            iWriteArrivals, iWriteEndLoc, iWriteMinimal,
-            pgrid, n_proj, io_arrival_mode));
 }
 
 /** function to write hypocenter/arrivals to output */
@@ -4786,55 +4563,6 @@ int fnmatch_wrapper(const struct dirent * entry) {
 
 }
 
-/** function to check for and expand wild card characters in filenames
-        and to return a list of equivalent files */
-
-int ExpandWildCards_OLD(char* fileName, char fileList[][FILENAME_MAX], int maxNumFiles) {
-    int istat;
-    int nfiles = 0;
-    char system_str[MAXLINE];
-    char list_file[FILENAME_MAX] = "filelist.tmp";
-    char *pchr;
-    FILE* fpio;
-
-
-    /* check for no '*' or '?' character */
-
-    if ((pchr = strchr(fileName, '*')) == NULL
-            && (pchr = strchr(fileName, '?')) == NULL) {
-        strcpy(fileList[0], fileName);
-        nfiles = 1;
-        return (nfiles);
-    }
-
-
-    /* expand wildcard file names into list of files */
-
-    sprintf(system_str, "ls %s > %s", fileName, list_file);
-    system(system_str);
-
-    if ((fpio = fopen(list_file, "r")) == NULL) {
-        nll_puterr2("ERROR: opening fileList temporary file: ", list_file);
-        return (-1);
-    }
-    NumFilesOpen++;
-
-    nfiles = 0;
-    while (nfiles < maxNumFiles &&
-            (istat = fscanf(fpio, "%s", fileList[nfiles])) != EOF
-            && istat == 1) {
-        nfiles++;
-    }
-
-
-    fclose(fpio);
-    NumFilesOpen--;
-
-    return (nfiles);
-
-
-}
-
 /** function to sort arrivals by obs_time field */
 
 int SortArrivalsTime(ArrivalDesc* arrival, int num_arrivals) {
@@ -5086,77 +4814,6 @@ void test_normal_dist_deviate() {
 
 }
 
-/** function to generate and display "traditional" statistics from grid file */
-
-int GenTraditionStats(GridDesc *pgrid, Vect3D *pexpect, Mtrx3D *pcov,
-        FILE * fpgrid) {
-    int istat;
-
-
-    /* allocate grid buffer */
-
-    pgrid->buffer = AllocateGrid(pgrid);
-    if (pgrid->buffer == NULL) {
-        nll_puterr(
-                "ERROR: allocating memory for 3D PDF grid buffer.");
-        exit(EXIT_ERROR_MEMORY);
-    }
-
-    /* create grid array access pointers */
-
-    pgrid->array = CreateGridArray(pgrid);
-    if (pgrid->array == NULL) {
-        nll_puterr(
-                "ERROR: creating array for accessing 3D PDF grid buffer.");
-        exit(EXIT_ERROR_MEMORY);
-    }
-
-
-    /* read PDF grid */
-
-    if ((istat = ReadGrid3dBuf(pgrid, fpgrid)) < 0) {
-        nll_puterr("ERROR: reading PDF grid from disk.");
-        exit(EXIT_ERROR_IO);
-    }
-
-
-    /* calculate expectation */
-
-    *pexpect = CalcExpectation(pgrid, NULL);
-    if (message_flag >= 3) {
-        sprintf(MsgStr, "EXPECTATION { x %lf  y %lf  z %lf }",
-                pexpect->x, pexpect->y, pexpect->z);
-        nll_putmsg(3, MsgStr);
-    }
-
-    /* calculate covariance matrix */
-
-    *pcov = CalcCovariance(pgrid, pexpect, NULL);
-    if (message_flag >= 3) {
-        sprintf(MsgStr, "COVARIANCE: {");
-        nll_putmsg(3, MsgStr);
-        sprintf(MsgStr, "   xx: %lf  xy: %lf  xz: %lf",
-                pcov->xx, pcov->xy, pcov->xz);
-        nll_putmsg(3, MsgStr);
-        sprintf(MsgStr, "   yx: %lf  yy: %lf  yz: %lf",
-                pcov->yx, pcov->yy, pcov->yz);
-        nll_putmsg(3, MsgStr);
-        sprintf(MsgStr, "   zx: %lf  zy: %lf  zz: %lf",
-                pcov->zx, pcov->zy, pcov->zz);
-        nll_putmsg(3, MsgStr);
-        sprintf(MsgStr, "}");
-        nll_putmsg(3, MsgStr);
-    }
-
-    /* clean up */
-
-    FreeGrid(pgrid);
-    DestroyGridArray(pgrid);
-
-    return (0);
-
-}
-
 /** function to calculate the expectation (mean) of a PDF grid */
 
 Vect3D CalcExpectation(GridDesc* pgrid, FILE * fpgrid) {
@@ -5199,92 +4856,6 @@ Vect3D CalcExpectation(GridDesc* pgrid, FILE * fpgrid) {
     expect.z = pgrid->origz + expect.z * pgrid->dz * volume;
 
     return (expect);
-}
-
-/** function to calculate the covariance a PDF grid */
-
-Mtrx3D CalcCovariance_OLD(GridDesc* pgrid, Vect3D* pexpect, FILE * fpgrid) {
-
-    int ix, iy, iz;
-
-    double val;
-    double x, y, z, xx, xy, xz, yy, yz, zz;
-    double volume;
-
-    Mtrx3D cov = {0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0};
-
-
-
-    /* cannot calculate for misfit grid */
-    if (pgrid->type == GRID_MISFIT) {
-        cov.xx = cov.xy = cov.xz =
-                cov.yx = cov.yy = cov.yz =
-                cov.zx = cov.zy = cov.zz
-                = -LARGE_DOUBLE;
-        return (cov);
-    }
-
-
-
-    /* calculate covariance following eq. (6-12), T & V, 1982 */
-
-
-    for (ix = 0; ix < pgrid->numx; ix++) {
-        x = pgrid->origx + (double) ix * pgrid->dx;
-        xx = x * x;
-
-        for (iy = 0; iy < pgrid->numy; iy++) {
-            y = pgrid->origy + (double) iy * pgrid->dy;
-            yy = y * y;
-            xy = x * y;
-
-            for (iz = 0; iz < pgrid->numz; iz++) {
-                z = pgrid->origz + (double) iz * pgrid->dz;
-                xz = x * z;
-                yz = y * z;
-                zz = z * z;
-
-                if (fpgrid != NULL)
-                    val = ReadGrid3dValue(fpgrid, ix, iy, iz, pgrid, 0);
-                else
-                    val = ((GRID_FLOAT_TYPE ***) pgrid->array)[ix][iy][iz];
-
-                if (val < 0.0) {
-                    printf("ERROR: CalcCovariance: Grid value < 0: ixyz= %d %d %d  value= %g\n", ix, iy, iz, val);
-                    continue;
-                }
-
-                cov.xx += (double) val * xx;
-                cov.xy += (double) val * xy;
-                cov.xz += (double) val * xz;
-
-                cov.yy += (double) val * yy;
-                cov.yz += (double) val * yz;
-
-                cov.zz += (double) val * zz;
-
-            }
-        }
-    }
-
-    volume = pgrid->dx * pgrid->dy * pgrid->dz;
-
-    printf("DEBUG: cov.yy = cov.yy(%g) * volume(%g) (= %g) - pexpect->y(%g) * pexpect->y (= %g)\n", cov.yy, volume, cov.yy * volume, pexpect->y, pexpect->y * pexpect->y);
-    cov.xx = cov.xx * volume - pexpect->x * pexpect->x;
-    cov.xy = cov.xy * volume - pexpect->x * pexpect->y;
-    cov.xz = cov.xz * volume - pexpect->x * pexpect->z;
-
-    cov.yx = cov.xy;
-    cov.yy = cov.yy * volume - pexpect->y * pexpect->y;
-    cov.yz = cov.yz * volume - pexpect->y * pexpect->z;
-
-    cov.zx = cov.xz;
-    cov.zy = cov.yz;
-    cov.zz = cov.zz * volume - pexpect->z * pexpect->z;
-
-    printf("DEBUG: CalcCovariance: volume= %g  cov.yy= %g\n", volume, cov.yy);
-
-    return (cov);
 }
 
 /** function to calculate the covariance a PDF grid */
@@ -5772,6 +5343,459 @@ void removeSpace(char *str) {
 
 }
 
+
+/** function to generate take-off angles from travel time grid
+                                using a numerical gradient aglorithm */
+
+int CalcAnglesGradient(GridDesc* ptgrid, GridDesc* pagrid, int angle_mode, int grid_mode) {
+
+    int ix, iy, iz, edge_flagx = 0, edge_flagy = 0, iflag2D = 0;
+//    double origx, origy, origz;
+    double dx, dy, dz;
+//    double dvol;
+    double xlow = 0.0, xhigh = 0.0;
+    double azim, dip;
+    int iqual;
+
+    TakeOffAngles angles = AnglesNULL;
+
+
+    /* write message */
+    sprintf(MsgStr, "Generating take-off angle grid...");
+    nll_putmsg(1, MsgStr);
+
+
+    if (grid_mode == GRID_TIME_2D) {
+        iflag2D = 1;
+        xlow = xhigh = 0.0;
+    }
+
+    /* estimate take-off angles from numerical gradients */
+
+//  origx = pagrid->origx;
+//  origy = pagrid->origy;
+//  origz = pagrid->origz;
+    dx = pagrid->dx;
+    dy = pagrid->dy;
+    dz = pagrid->dz;
+//  dvol = dx * dy * dz;
+
+    for (ix = 0; ix < pagrid->numx; ix++) {
+        /* 2D grids, store angles in ix = 0 sheet */
+        if (ix == 1 && iflag2D)
+            edge_flagx = 1;
+        if ((ix == 0 || ix == pagrid->numx - 1)
+                && grid_mode == GRID_TIME)
+            edge_flagx = 1;
+        for (iy = 0; iy < pagrid->numy; iy++) {
+            if (iy == 0 || iy == pagrid->numy - 1)
+                edge_flagy = 1;
+            for (iz = 0; iz < pagrid->numz; iz++) {
+
+                /* no calculation for edges of grid */
+                if (edge_flagx || edge_flagy
+                        || iz == 0 || iz == pagrid->numz - 1) {
+                    ((GRID_FLOAT_TYPE ***) pagrid->array)[ix][iy][iz] = AnglesNULL.fval;
+                    continue;
+                }
+
+                if (!iflag2D) {
+                    xlow = ((GRID_FLOAT_TYPE ***) ptgrid->array)[ix - 1][iy][iz];
+                    xhigh = ((GRID_FLOAT_TYPE ***) ptgrid->array)[ix + 1][iy][iz];
+                }
+                angles = GetGradientAngles(
+                        ((GRID_FLOAT_TYPE ***) ptgrid->array)[ix][iy][iz],
+                        xlow,
+                        xhigh,
+                        ((GRID_FLOAT_TYPE ***) ptgrid->array)[ix][iy - 1][iz],
+                        ((GRID_FLOAT_TYPE ***) ptgrid->array)[ix][iy + 1][iz],
+                        /* intentional reversal of z
+                                signs to get pos = up */
+                        ((GRID_FLOAT_TYPE ***) ptgrid->array)[ix][iy][iz + 1],
+                        ((GRID_FLOAT_TYPE ***) ptgrid->array)[ix][iy][iz - 1],
+                        dx, dy, dz, iflag2D,
+                        &azim, &dip, &iqual);
+                if (angle_mode == ANGLE_MODE_YES) {
+                    ((GRID_FLOAT_TYPE ***) pagrid->array)[ix][iy][iz] = angles.fval;
+                } else if (angle_mode == ANGLE_MODE_INCLINATION) {
+                    ((
+
+                            GRID_FLOAT_TYPE ***) pagrid->array)[ix][iy][iz] = dip;
+                }
+
+            }
+            edge_flagy = 0;
+        }
+        edge_flagx = 0;
+    }
+
+
+    return (0);
+
+}
+
+/** function to generate take-off angles from time grid node values */
+
+TakeOffAngles GetGradientAngles(double vcent, double xlow, double xhigh,
+        double ylow, double yhigh, double zlow, double zhigh,
+        double dx, double dy, double dz, int iflag2D,
+        double *pazim, double *pdip, int *piqual) {
+
+    double grad_low, grad_high, gradx, grady, gradz, azim, dip;
+    int iqualx, iqualy, iqualz, iqual, iflip;
+    TakeOffAngles angles = AnglesNULL;
+
+
+
+    /* calculate gradient of travel time and quality in Z direction */
+    grad_low = (vcent - zlow) / dz;
+    grad_high = (zhigh - vcent) / dz;
+    iqualz = CalcAnglesQuality(grad_low, grad_high);
+    gradz = (grad_low + grad_high) / 2.0;
+    gradz = -gradz; /* reverse sign to get take-off angle */
+
+    /* calculate gradient of travel time and quality in Y direction */
+    grad_low = (vcent - ylow) / dy;
+    grad_high = (yhigh - vcent) / dy;
+    iqualy = CalcAnglesQuality(grad_low, grad_high);
+    grady = (grad_low + grad_high) / 2.0;
+    grady = -grady; /* reverse sign to get take-off angle */
+
+    /* thats all for 2D grids */
+    if (iflag2D) {
+        /* calculate dip angle (range of 0 (down) to 180 (up)) */
+        dip = atan2(grady, -gradz) / cRPD;
+        iflip = 0;
+        if (dip > 180.0) {
+            dip = dip - 180.0;
+            iflip = 1;
+        } else if (dip < 0.0) {
+            dip = -dip;
+            iflip = 1;
+        }
+        /* calculate azimuth polarity (1 or -1) relative to pos Y dir */
+        azim = iflip ? -1.0 : 1.0;
+        /* find combined quality - weighted average of component qual */
+        iqual = (fabs(grady) * (double) iqualy
+                + fabs(gradz) * (double) iqualz)
+                / (fabs(grady) + fabs(gradz));
+        /* set angles */
+        angles = SetTakeOffAngles(azim, dip, iqual);
+        *pazim = azim;
+        *pdip = dip;
+        *piqual = iqual;
+        return (angles);
+    }
+
+    /* calculate gradient of travel time and quality in X direction */
+    grad_low = (vcent - xlow) / dx;
+    grad_high = (xhigh - vcent) / dx;
+    iqualx = CalcAnglesQuality(grad_low, grad_high);
+    gradx = (grad_low + grad_high) / 2.0;
+    gradx = -gradx; /* reverse sign to get take-off angle */
+
+    /* find combined quality - weighted average of component qual */
+    iqual = (fabs(gradx) * (double) iqualx
+            + fabs(grady) * (double) iqualy
+            + fabs(gradz) * (double) iqualz)
+            / (fabs(gradx) + fabs(grady) + fabs(gradz));
+
+    /* calculate dip angle (range of 0 (down) to 180 (up)) */
+    dip = atan2(sqrt(gradx * gradx + grady * grady), -gradz) / cRPD;
+    /* calculate azimuth angle (0 to 360) */
+    azim = atan2(gradx, grady) / cRPD;
+    if (azim < 0.0)
+        azim += 360.0;
+    angles = SetTakeOffAngles(azim, dip, iqual);
+
+    // return double angles values
+    *pazim = azim;
+    *pdip = dip;
+    *piqual = iqual;
+
+    return (angles);
+
+}
+
+
+
+/** function to estimate quality of take-off angle determination */
+
+/* quality is:	0 if sign of A = grad_low and B = grad_high differ
+                0->10 as (2AB / (AA + BB)) -> 1;
+ */
+
+int CalcAnglesQuality(double grad_low, double grad_high) {
+
+    double ratio;
+
+    /* if both gradients are zero, return highest quality */
+    if (fabs(grad_low) + fabs(grad_high) < SMALL_DOUBLE)
+        return (10);
+
+    /* calculate quality */
+    ratio = 2.0 * grad_low * grad_high /
+            (grad_low * grad_low + grad_high * grad_high);
+    return (ratio > 0.0 ? (int) (10.01 * ratio) : 0);
+
+}
+
+
+
+#ifdef NLL_DEAD_CODE
+
+/** function to calculate the covariance a PDF grid */
+
+Mtrx3D CalcCovariance_OLD(GridDesc* pgrid, Vect3D* pexpect, FILE * fpgrid) {
+
+    int ix, iy, iz;
+
+    double val;
+    double x, y, z, xx, xy, xz, yy, yz, zz;
+    double volume;
+
+    Mtrx3D cov = {0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0};
+
+
+
+    /* cannot calculate for misfit grid */
+    if (pgrid->type == GRID_MISFIT) {
+        cov.xx = cov.xy = cov.xz =
+                cov.yx = cov.yy = cov.yz =
+                cov.zx = cov.zy = cov.zz
+                = -LARGE_DOUBLE;
+        return (cov);
+    }
+
+
+
+    /* calculate covariance following eq. (6-12), T & V, 1982 */
+
+
+    for (ix = 0; ix < pgrid->numx; ix++) {
+        x = pgrid->origx + (double) ix * pgrid->dx;
+        xx = x * x;
+
+        for (iy = 0; iy < pgrid->numy; iy++) {
+            y = pgrid->origy + (double) iy * pgrid->dy;
+            yy = y * y;
+            xy = x * y;
+
+            for (iz = 0; iz < pgrid->numz; iz++) {
+                z = pgrid->origz + (double) iz * pgrid->dz;
+                xz = x * z;
+                yz = y * z;
+                zz = z * z;
+
+                if (fpgrid != NULL)
+                    val = ReadGrid3dValue(fpgrid, ix, iy, iz, pgrid, 0);
+                else
+                    val = ((GRID_FLOAT_TYPE ***) pgrid->array)[ix][iy][iz];
+
+                if (val < 0.0) {
+                    printf("ERROR: CalcCovariance: Grid value < 0: ixyz= %d %d %d  value= %g\n", ix, iy, iz, val);
+                    continue;
+                }
+
+                cov.xx += (double) val * xx;
+                cov.xy += (double) val * xy;
+                cov.xz += (double) val * xz;
+
+                cov.yy += (double) val * yy;
+                cov.yz += (double) val * yz;
+
+                cov.zz += (double) val * zz;
+
+            }
+        }
+    }
+
+    volume = pgrid->dx * pgrid->dy * pgrid->dz;
+
+    printf("DEBUG: cov.yy = cov.yy(%g) * volume(%g) (= %g) - pexpect->y(%g) * pexpect->y (= %g)\n", cov.yy, volume, cov.yy * volume, pexpect->y, pexpect->y * pexpect->y);
+    cov.xx = cov.xx * volume - pexpect->x * pexpect->x;
+    cov.xy = cov.xy * volume - pexpect->x * pexpect->y;
+    cov.xz = cov.xz * volume - pexpect->x * pexpect->z;
+
+    cov.yx = cov.xy;
+    cov.yy = cov.yy * volume - pexpect->y * pexpect->y;
+    cov.yz = cov.yz * volume - pexpect->y * pexpect->z;
+
+    cov.zx = cov.xz;
+    cov.zy = cov.yz;
+    cov.zz = cov.zz * volume - pexpect->z * pexpect->z;
+
+    printf("DEBUG: CalcCovariance: volume= %g  cov.yy= %g\n", volume, cov.yy);
+
+    return (cov);
+}
+
+/** function to calculate distance between 2 XYZ points */
+
+double Dist2D(double x1, double x2, double y1, double y2) {
+
+    if (GeometryMode == MODE_GLOBAL) {
+        return (GCDistance(y1, x1, y2, x2));
+        //return(EllipsoidDistance(yval, xval, psta->y, psta->x));
+    } else {
+        double dx, dy;
+        dx = x1 - x2;
+        dy = y1 - y2;
+        return (sqrt(dx * dx + dy * dy));
+    }
+}
+
+/** function to check for and expand wild card characters in filenames
+        and to return a list of equivalent files */
+
+int ExpandWildCards_OLD(char* fileName, char fileList[][FILENAME_MAX], int maxNumFiles) {
+    int istat;
+    int nfiles = 0;
+    char system_str[MAXLINE];
+    char list_file[FILENAME_MAX] = "filelist.tmp";
+    char *pchr;
+    FILE* fpio;
+
+
+    /* check for no '*' or '?' character */
+
+    if ((pchr = strchr(fileName, '*')) == NULL
+            && (pchr = strchr(fileName, '?')) == NULL) {
+        strcpy(fileList[0], fileName);
+        nfiles = 1;
+        return (nfiles);
+    }
+
+
+    /* expand wildcard file names into list of files */
+
+    sprintf(system_str, "ls %s > %s", fileName, list_file);
+    system(system_str);
+
+    if ((fpio = fopen(list_file, "r")) == NULL) {
+        nll_puterr2("ERROR: opening fileList temporary file: ", list_file);
+        return (-1);
+    }
+    NumFilesOpen++;
+
+    nfiles = 0;
+    while (nfiles < maxNumFiles &&
+            (istat = fscanf(fpio, "%s", fileList[nfiles])) != EOF
+            && istat == 1) {
+        nfiles++;
+    }
+
+
+    fclose(fpio);
+    NumFilesOpen--;
+
+    return (nfiles);
+
+
+}
+
+/** function to generate and display "traditional" statistics from grid file */
+
+int GenTraditionStats(GridDesc *pgrid, Vect3D *pexpect, Mtrx3D *pcov,
+        FILE * fpgrid) {
+    int istat;
+
+
+    /* allocate grid buffer */
+
+    pgrid->buffer = AllocateGrid(pgrid);
+    if (pgrid->buffer == NULL) {
+        nll_puterr(
+                "ERROR: allocating memory for 3D PDF grid buffer.");
+        exit(EXIT_ERROR_MEMORY);
+    }
+
+    /* create grid array access pointers */
+
+    pgrid->array = CreateGridArray(pgrid);
+    if (pgrid->array == NULL) {
+        nll_puterr(
+                "ERROR: creating array for accessing 3D PDF grid buffer.");
+        exit(EXIT_ERROR_MEMORY);
+    }
+
+
+    /* read PDF grid */
+
+    if ((istat = ReadGrid3dBuf(pgrid, fpgrid)) < 0) {
+        nll_puterr("ERROR: reading PDF grid from disk.");
+        exit(EXIT_ERROR_IO);
+    }
+
+
+    /* calculate expectation */
+
+    *pexpect = CalcExpectation(pgrid, NULL);
+    if (message_flag >= 3) {
+        sprintf(MsgStr, "EXPECTATION { x %lf  y %lf  z %lf }",
+                pexpect->x, pexpect->y, pexpect->z);
+        nll_putmsg(3, MsgStr);
+    }
+
+    /* calculate covariance matrix */
+
+    *pcov = CalcCovariance(pgrid, pexpect, NULL);
+    if (message_flag >= 3) {
+        sprintf(MsgStr, "COVARIANCE: {");
+        nll_putmsg(3, MsgStr);
+        sprintf(MsgStr, "   xx: %lf  xy: %lf  xz: %lf",
+                pcov->xx, pcov->xy, pcov->xz);
+        nll_putmsg(3, MsgStr);
+        sprintf(MsgStr, "   yx: %lf  yy: %lf  yz: %lf",
+                pcov->yx, pcov->yy, pcov->yz);
+        nll_putmsg(3, MsgStr);
+        sprintf(MsgStr, "   zx: %lf  zy: %lf  zz: %lf",
+                pcov->zx, pcov->zy, pcov->zz);
+        nll_putmsg(3, MsgStr);
+        sprintf(MsgStr, "}");
+        nll_putmsg(3, MsgStr);
+    }
+
+    /* clean up */
+
+    FreeGrid(pgrid);
+    DestroyGridArray(pgrid);
+
+    return (0);
+
+}
+
+/** function to read output file name ***/
+
+int get_outfile(char* line1) {
+
+    int istat;
+
+    istat = sscanf(line1, "%s", fn_output);
+
+    sprintf(MsgStr, "OUTPUT FILES: %s.*", fn_output);
+    nll_putmsg(3, MsgStr);
+
+    if (istat != 1)
+        return (-1);
+
+    return (0);
+}
+
+/** function to initialize buffer for 3D grid ***/
+
+int InitializeGrid(GridDesc* pgrid, GRID_FLOAT_TYPE init_value) {
+
+    GRID_FLOAT_TYPE *gbuf;
+
+    gbuf = (GRID_FLOAT_TYPE *) pgrid->buffer + pgrid->numx * pgrid->numy * pgrid->numz;
+
+    while (gbuf-- > (GRID_FLOAT_TYPE *) pgrid->buffer)
+        *gbuf = init_value;
+
+    return (0);
+}
+
 /** function to read fpfit summary record to HypoDesc structure */
 
 int ReadFpfitSum(FILE *fp_in, HypoDesc * phypo) {
@@ -5862,12 +5886,183 @@ int ReadFpfitSum(FILE *fp_in, HypoDesc * phypo) {
 
 }
 
+/** function to read grid header file ***/
+
+int ReadGrid3dHdr(GridDesc* pgrid, SourceDesc* psrce, char* filename, char* file_type) {
+
+    FILE *fpio;
+    char fname[FILENAME_MAX];
 
 
 
+    /* read header file */
+
+    sprintf(fname, "%s.%s.hdr", filename, file_type);
+    if ((fpio = fopen(fname, "r")) == NULL) {
+        if (message_flag >= 1)
+            nll_puterr2("ERROR: opening grid header file: %s", fname);
+        return (-1);
+    }
+    NumFilesOpen++;
+
+
+    if (ReadGrid3dHdr_grid_description(fpio, pgrid, fname) < 0) {
+        fclose(fpio);
+        NumFilesOpen--;
+        return (-1);
+    }
+
+    if (strncmp(file_type, "time", 4) == 0
+            || strncmp(file_type, "angle", 4) == 0)
+        fscanf(fpio, "%s %lf %lf %lf\n",
+            psrce->label, &(psrce->x), &(psrce->y), &(psrce->z));
+
+
+    //  check for optional header lines
+    char line[MAXLINE_LONG];
+    char tag[MAXLINE_LONG];
+
+    // check for map projection
+    strcpy(pgrid->mapProjStr, "");
+    rewind(fpio);
+    while (fgets(line, MAXLINE_LONG, fpio) != NULL) {
+        int istat = sscanf(line, "%s", tag);
+        if (istat == 1 && strcmp(tag, "TRANSFORM") == 0) {
+            strcpy(pgrid->mapProjStr, line);
+        }
+    }
+
+    // check if cascading grid
+    pgrid->flagGridCascading = IS_NOT_CASCADING;
+    int num_z_merge_depths;
+    rewind(fpio);
+    while (fgets(line, MAXLINE_LONG, fpio) != NULL) {
+        int istat = sscanf(line, "%s %d", tag, &num_z_merge_depths);
+        if (istat == 2 && strcmp(tag, "CASCADING_GRID") == 0) {
+            setCascadingGrid(pgrid);
+            pgrid->gridDesc_Cascading.num_z_merge_depths = num_z_merge_depths;
+            if (pgrid->gridDesc_Cascading.num_z_merge_depths > MAX_NUM_Z_MERGE_DEPTHS) {
+                pgrid->gridDesc_Cascading.num_z_merge_depths = MAX_NUM_Z_MERGE_DEPTHS;
+                sprintf(MsgStr, "ERROR: too many cascading grid Z merge depths, only using first %d depths.",
+                        pgrid->gridDesc_Cascading.num_z_merge_depths);
+                nll_puterr(MsgStr);
+            }
+            // 20170207 AJL - z_merge_depths moved to fixed array to ease memory management
+            //pgrid->gridDesc_Cascading.z_merge_depths = (double*) malloc((size_t) num_z_merge_depths * sizeof (double));
+            char doubling_depths[1024];
+            sscanf(line, "%*s %*d %s", doubling_depths);
+            char *str_pos = strtok(doubling_depths, ",");
+            int n = 0;
+            while (str_pos != NULL) {
+                pgrid->gridDesc_Cascading.z_merge_depths[n] = atof(str_pos);
+                //printf("DEBUG: CASCADING_GRID doubling depth added: %s %f\n", str_pos, pgrid->gridDesc_Cascading.z_merge_depths[n]);
+                n++;
+                str_pos = strtok(NULL, ",");
+            }
+        }
+    }
+
+    fclose(fpio);
+    NumFilesOpen--;
+
+    return (0);
+}
+
+/** function to read cascading grid data from disk or array at upper xyz indices corresponding to regular grid index location
+ *
+ * 20161019 AJL - added
+ *
+ *  ix, iy, iz are indices in virtual, regular grid equivalent to this cascading grid
+ */
+
+GRID_FLOAT_TYPE ReadGrid3dValue_Cascading(FILE *fpgrid, int ix, int iy, int iz, GridDesc * pgrid) {
+
+    // check indexes in range
+    // ix, iy, iz are indices in virtual, regular grid equivalent to this cascading grid
+    if (ix < 0 || ix >= pgrid->numx || iy < 0 || iy >= pgrid->numy || iz < 0 || iz >= pgrid->numz) {
+        //nll_puterr("WARNING: grid file index out of range.");
+        return (-VERY_LARGE_FLOAT);
+    }
+
+    // need grid array to find offset
+    if (pgrid->array == NULL) {
+        if (pgrid->buffer == NULL) {
+            // prepare grid memory without allocating buffer, required to initialize cascading grid array
+            AllocateGrid_Cascading(pgrid, 0);
+        }
+        pgrid->array = CreateGridArray_Cascading(pgrid);
+    }
+
+    // set x,y,z indices in cascading grid
+    int iz_casc = pgrid->gridDesc_Cascading.zindex[iz];
+    int ix_casc = ix / pgrid->gridDesc_Cascading.xyz_scale[iz];
+    int iy_casc = iy / pgrid->gridDesc_Cascading.xyz_scale[iz];
+
+
+    // get fvalue
+    GRID_FLOAT_TYPE fvalue = ReadCascadingGrid3dValue(fpgrid, ix_casc, iy_casc, iz_casc, pgrid);
+
+    return (fvalue);
+}
 
 
 
+/** function to sum 2 grids ***/
+
+/* reads from  array if fp_grid_new == NULL */
+
+//#define DEBUG_SUMGRIDS
+
+int SumGrids(GridDesc* pgrid_sum, GridDesc* pgrid_new, FILE* fp_grid_new, double factor) {
+
+    int ix, iy, iz;
+    GRID_FLOAT_TYPE xval, yval, zval, newval;
+
+    xval = pgrid_sum->origx;
+    for (ix = 0; ix < pgrid_sum->numx; ix++) {
+
+        yval = pgrid_sum->origy;
+        for (iy = 0; iy < pgrid_sum->numy; iy++) {
+
+            zval = pgrid_sum->origz;
+            for (iz = 0; iz < pgrid_sum->numz; iz++) {
+
+                if ((newval = ReadAbsInterpGrid3d(fp_grid_new, pgrid_new, xval, yval, zval, 0)) > -LARGE_FLOAT) {
+#ifdef DEBUG_SUMGRIDS
+                    float result = ((GRID_FLOAT_TYPE ***) pgrid_sum->array)[ix][iy][iz] + factor * newval;
+                    if (factor < 0.0 && fabs(result) > 1.0)
+                        printf("DEBUG: SumGrids: %d %d %d  %f + %f * %f = %f\n",
+                            ix, iy, iz, ((GRID_FLOAT_TYPE ***) pgrid_sum->array)[ix][iy][iz], factor, newval, result);
+#endif
+                    ((GRID_FLOAT_TYPE ***) pgrid_sum->array)[ix][iy][iz] += factor * newval;
+                }
+
+                zval += pgrid_sum->dz;
+            }
+
+            yval += pgrid_sum->dy;
+        }
+
+        xval += pgrid_sum->dx;
+    }
+
+
+    return (0);
+}
+
+
+/** function to write arrivals to output */
+
+int WritePhases(FILE *fpio, HypoDesc* phypo, ArrivalDesc* parrivals,
+        int narrivals, char* filename,
+        int iWriteArrivals, int iWriteEndLoc, int iWriteMinimal,
+        GridDesc* pgrid, int n_proj, int io_arrival_mode) {
+
+    return (_WriteLocation(fpio, phypo, parrivals,
+            narrivals, filename,
+            iWriteArrivals, iWriteEndLoc, iWriteMinimal,
+            pgrid, n_proj, io_arrival_mode));
+}
 
 
 
@@ -6088,208 +6283,12 @@ int WriteDiffArrival(FILE* fpio, HypoDesc* hypos, ArrivalDesc* parr, int iWriteT
 
 }
 
-/** function to generate take-off angles from travel time grid
-                                using a numerical gradient aglorithm */
-
-int CalcAnglesGradient(GridDesc* ptgrid, GridDesc* pagrid, int angle_mode, int grid_mode) {
-
-    int ix, iy, iz, edge_flagx = 0, edge_flagy = 0, iflag2D = 0;
-//    double origx, origy, origz;
-    double dx, dy, dz;
-//    double dvol;
-    double xlow = 0.0, xhigh = 0.0;
-    double azim, dip;
-    int iqual;
-
-    TakeOffAngles angles = AnglesNULL;
-
-
-    /* write message */
-    sprintf(MsgStr, "Generating take-off angle grid...");
-    nll_putmsg(1, MsgStr);
-
-
-    if (grid_mode == GRID_TIME_2D) {
-        iflag2D = 1;
-        xlow = xhigh = 0.0;
-    }
-
-    /* estimate take-off angles from numerical gradients */
-
-//  origx = pagrid->origx;
-//  origy = pagrid->origy;
-//  origz = pagrid->origz;
-    dx = pagrid->dx;
-    dy = pagrid->dy;
-    dz = pagrid->dz;
-//  dvol = dx * dy * dz;
-
-    for (ix = 0; ix < pagrid->numx; ix++) {
-        /* 2D grids, store angles in ix = 0 sheet */
-        if (ix == 1 && iflag2D)
-            edge_flagx = 1;
-        if ((ix == 0 || ix == pagrid->numx - 1)
-                && grid_mode == GRID_TIME)
-            edge_flagx = 1;
-        for (iy = 0; iy < pagrid->numy; iy++) {
-            if (iy == 0 || iy == pagrid->numy - 1)
-                edge_flagy = 1;
-            for (iz = 0; iz < pagrid->numz; iz++) {
-
-                /* no calculation for edges of grid */
-                if (edge_flagx || edge_flagy
-                        || iz == 0 || iz == pagrid->numz - 1) {
-                    ((GRID_FLOAT_TYPE ***) pagrid->array)[ix][iy][iz] = AnglesNULL.fval;
-                    continue;
-                }
-
-                if (!iflag2D) {
-                    xlow = ((GRID_FLOAT_TYPE ***) ptgrid->array)[ix - 1][iy][iz];
-                    xhigh = ((GRID_FLOAT_TYPE ***) ptgrid->array)[ix + 1][iy][iz];
-                }
-                angles = GetGradientAngles(
-                        ((GRID_FLOAT_TYPE ***) ptgrid->array)[ix][iy][iz],
-                        xlow,
-                        xhigh,
-                        ((GRID_FLOAT_TYPE ***) ptgrid->array)[ix][iy - 1][iz],
-                        ((GRID_FLOAT_TYPE ***) ptgrid->array)[ix][iy + 1][iz],
-                        /* intentional reversal of z
-                                signs to get pos = up */
-                        ((GRID_FLOAT_TYPE ***) ptgrid->array)[ix][iy][iz + 1],
-                        ((GRID_FLOAT_TYPE ***) ptgrid->array)[ix][iy][iz - 1],
-                        dx, dy, dz, iflag2D,
-                        &azim, &dip, &iqual);
-                if (angle_mode == ANGLE_MODE_YES) {
-                    ((GRID_FLOAT_TYPE ***) pagrid->array)[ix][iy][iz] = angles.fval;
-                } else if (angle_mode == ANGLE_MODE_INCLINATION) {
-                    ((
-
-                            GRID_FLOAT_TYPE ***) pagrid->array)[ix][iy][iz] = dip;
-                }
-
-            }
-            edge_flagy = 0;
-        }
-        edge_flagx = 0;
-    }
-
-
-    return (0);
-
-}
-
-/** function to generate take-off angles from time grid node values */
-
-TakeOffAngles GetGradientAngles(double vcent, double xlow, double xhigh,
-        double ylow, double yhigh, double zlow, double zhigh,
-        double dx, double dy, double dz, int iflag2D,
-        double *pazim, double *pdip, int *piqual) {
-
-    double grad_low, grad_high, gradx, grady, gradz, azim, dip;
-    int iqualx, iqualy, iqualz, iqual, iflip;
-    TakeOffAngles angles = AnglesNULL;
-
-
-
-    /* calculate gradient of travel time and quality in Z direction */
-    grad_low = (vcent - zlow) / dz;
-    grad_high = (zhigh - vcent) / dz;
-    iqualz = CalcAnglesQuality(grad_low, grad_high);
-    gradz = (grad_low + grad_high) / 2.0;
-    gradz = -gradz; /* reverse sign to get take-off angle */
-
-    /* calculate gradient of travel time and quality in Y direction */
-    grad_low = (vcent - ylow) / dy;
-    grad_high = (yhigh - vcent) / dy;
-    iqualy = CalcAnglesQuality(grad_low, grad_high);
-    grady = (grad_low + grad_high) / 2.0;
-    grady = -grady; /* reverse sign to get take-off angle */
-
-    /* thats all for 2D grids */
-    if (iflag2D) {
-        /* calculate dip angle (range of 0 (down) to 180 (up)) */
-        dip = atan2(grady, -gradz) / cRPD;
-        iflip = 0;
-        if (dip > 180.0) {
-            dip = dip - 180.0;
-            iflip = 1;
-        } else if (dip < 0.0) {
-            dip = -dip;
-            iflip = 1;
-        }
-        /* calculate azimuth polarity (1 or -1) relative to pos Y dir */
-        azim = iflip ? -1.0 : 1.0;
-        /* find combined quality - weighted average of component qual */
-        iqual = (fabs(grady) * (double) iqualy
-                + fabs(gradz) * (double) iqualz)
-                / (fabs(grady) + fabs(gradz));
-        /* set angles */
-        angles = SetTakeOffAngles(azim, dip, iqual);
-        *pazim = azim;
-        *pdip = dip;
-        *piqual = iqual;
-        return (angles);
-    }
-
-    /* calculate gradient of travel time and quality in X direction */
-    grad_low = (vcent - xlow) / dx;
-    grad_high = (xhigh - vcent) / dx;
-    iqualx = CalcAnglesQuality(grad_low, grad_high);
-    gradx = (grad_low + grad_high) / 2.0;
-    gradx = -gradx; /* reverse sign to get take-off angle */
-
-    /* find combined quality - weighted average of component qual */
-    iqual = (fabs(gradx) * (double) iqualx
-            + fabs(grady) * (double) iqualy
-            + fabs(gradz) * (double) iqualz)
-            / (fabs(gradx) + fabs(grady) + fabs(gradz));
-
-    /* calculate dip angle (range of 0 (down) to 180 (up)) */
-    dip = atan2(sqrt(gradx * gradx + grady * grady), -gradz) / cRPD;
-    /* calculate azimuth angle (0 to 360) */
-    azim = atan2(gradx, grady) / cRPD;
-    if (azim < 0.0)
-        azim += 360.0;
-    angles = SetTakeOffAngles(azim, dip, iqual);
-
-    // return double angles values
-    *pazim = azim;
-    *pdip = dip;
-    *piqual = iqual;
-
-    return (angles);
-
-}
-
-
-
-/** function to estimate quality of take-off angle determination */
-
-/* quality is:	0 if sign of A = grad_low and B = grad_high differ
-                0->10 as (2AB / (AA + BB)) -> 1;
- */
-
-int CalcAnglesQuality(double grad_low, double grad_high) {
-
-    double ratio;
-
-    /* if both gradients are zero, return highest quality */
-    if (fabs(grad_low) + fabs(grad_high) < SMALL_DOUBLE)
-        return (10);
-
-    /* calculate quality */
-    ratio = 2.0 * grad_low * grad_high /
-            (grad_low * grad_low + grad_high * grad_high);
-    return (ratio > 0.0 ? (int) (10.01 * ratio) : 0);
-
-}
-
-
 
 
 // END - DD
 //========================================================
 
+#endif //NLL_DEAD_CODE
 
 /*------------------------------------------------------------/ */
 /* Anthony Lomax           | email: lomax@faille.unice.fr     / */

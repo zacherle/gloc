@@ -41,6 +41,7 @@ tel: +33(0)493752502  e-mail: anthony@alomax.net  web: http://www.alomax.net
 
 
 #include "loclist.h"
+#include "location.h"
 #include "GridLib.h"
 #include <stdio.h>
 
@@ -62,6 +63,37 @@ tel: +33(0)493752502  e-mail: anthony@alomax.net  web: http://www.alomax.net
 #define INVALID_DOUBLE -VERY_LARGE_DOUBLE
 
 #define MAX_NUM_LOCATIONS 1000
+
+
+
+/*------------------------------------------------------------/ */
+/* function declarations */
+/*------------------------------------------------------------/ */
+
+/* loclist */
+
+Location *newLocation(HypoDesc *phypo, ArrivalDesc* parrivals, int narrivals, GridDesc *pgrid, Tree3D* poctTree, float *pscatterSample);
+LocNode *addLocationToLocList(LocNode **phead, Location *plocation, int id);
+LocNode *removeLocationFromLocList(LocNode *head, LocNode* addr, int freeHypoDesc);
+int freeLocList(LocNode *head, int freeHypoDesc);
+void freeLocation(Location *plocation);
+//LocNode *addNLLLocationFileToLocList(LocNode **phead, char *filein, int id, PhsNode **phsNodeList);
+int writeLocList(LocNode *head, FILE *out);
+void writeLocNode(LocNode *addr, FILE *out);
+double getLocTimeValue(HypoDesc *phypo);
+LocNode **findLocsWithFirstPhaseInTimeWindow(LocNode *LocListHead, double tmin, double tmax);
+ArrivalDesc *findArrivalInLocation(Location *plocation, ArrivalDesc *arrivalKey);
+int arrivalBeforeLastLocateArrival(ArrivalDesc *arrivalKey, Location *plocation);
+// AJL 20070323-
+LocNode *getLocationFromLocList(LocNode *head, int id);
+
+
+/* */
+/*------------------------------------------------------------/ */
+
+
+
+
 
 
 /** function to create a new LocNode from a NLL HypoDesc structure - sorted by id */

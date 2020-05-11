@@ -79,114 +79,6 @@ Vect3D CalcExpectationSamples(float* fdata, int nSamples) {
     return (expect);
 }
 
-/** function to calculate the expectation (mean)  of a set of samples */
-
-Vect3D CalcExpectationSamplesWeighted(float* fdata, int nSamples) {
-
-    int nsamp, ipos;
-
-    float x, y, z;
-    Vect3D expect = {0.0, 0.0, 0.0};
-
-    double weight;
-    double weight_sum = 0.0;
-
-    ipos = 0;
-    for (nsamp = 0; nsamp < nSamples; nsamp++) {
-        x = fdata[ipos++];
-        y = fdata[ipos++];
-        z = fdata[ipos++];
-        weight = fdata[ipos++];
-        expect.x += (double) x * weight;
-        expect.y += (double) y * weight;
-        expect.z += (double) z * weight;
-        weight_sum += weight;
-    }
-
-    expect.x /= weight_sum;
-    expect.y /= weight_sum;
-    expect.z /= weight_sum;
-
-    return (expect);
-}
-
-/** function to calculate the expectation (mean) of a set of samples (lon,lat,depth,weight)
- *
- * global case - checks for wrap around in longitude (x) using specified xReference as correct longitude zone
- * TODO: uses rectangular lat/lon geometry, does not try and correct for change in longitude distance with latitude.
- * TODO: does not try and correct for problems in latitude near poles.
- *
- */
-
-Vect3D CalcExpectationSamplesGlobal(float* fdata, int nSamples, double xReference) {
-
-    int nsamp, ipos;
-
-    double x, y, z;
-    Vect3D expect = {0.0, 0.0, 0.0};
-
-    ipos = 0;
-    for (nsamp = 0; nsamp < nSamples; nsamp++) {
-        x = fdata[ipos++];
-        if (x - xReference > 180.0)
-            x -= 360.0;
-        else if (x - xReference < -180.0)
-            x += 360.0;
-        y = fdata[ipos++];
-        z = fdata[ipos++];
-        ipos++; // fdata value is in 4th position
-        expect.x += x;
-        expect.y += y;
-        expect.z += z;
-    }
-
-    expect.x /= (double) nSamples;
-    expect.y /= (double) nSamples;
-    expect.z /= (double) nSamples;
-
-    return (expect);
-}
-
-/** function to calculate the weighted expectation (mean) of a set of samples (lon,lat,depth,weight)
- *
- * global case - checks for wrap around in longitude (x) using specified xReference as correct longitude zone
- * TODO: does not try and correct for problems in latitude near poles.
- *
- */
-
-Vect3D CalcExpectationSamplesGlobalWeighted(float* fdata, int nSamples, double xReference) {
-
-    int nsamp, ipos;
-
-    double x, y, z;
-    Vect3D expect = {0.0, 0.0, 0.0};
-
-    double weight;
-    double weight_sum = 0.0;
-
-    ipos = 0;
-    for (nsamp = 0; nsamp < nSamples; nsamp++) {
-        x = fdata[ipos++];
-        if (x - xReference > 180.0)
-            x -= 360.0;
-        else if (x - xReference < -180.0)
-            x += 360.0;
-        y = fdata[ipos++];
-        z = fdata[ipos++];
-        weight = fdata[ipos++];
-        expect.x += x * weight;
-        expect.y += y * weight;
-        expect.z += z * weight;
-        weight_sum += weight;
-    }
-
-    expect.x /= weight_sum;
-    expect.y /= weight_sum;
-    expect.z /= weight_sum;
-
-    return (expect);
-}
-
 /** function to calculate the covariance of a set of samples assumed to be distributed following a target PDF
  *
  * 20141030 AJL - Bug fix: new version which subtracts the expectation from each data value before summing,
@@ -235,57 +127,6 @@ Mtrx3D CalcCovarianceSamplesRect(float* fdata, int nSamples, Vect3D* pexpect) {
     cov.zx = cov.xz;
     cov.zy = cov.yz;
     cov.zz = cov.zz / (double) nSamples;
-
-
-    return (cov);
-}
-
-/** function to calculate the covariance of a set of samples
- *
- * !!! DO NOT USE - subject to precision errors!
- */
-
-Mtrx3D CalcCovarianceSamplesRect_OLD(float* fdata, int nSamples, Vect3D* pexpect) {
-
-    int nsamp, ipos;
-
-    float x, y, z;
-//    float prob;
-
-    Mtrx3D cov = {0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0};
-
-
-    /* calculate covariance following eq. (6-12), T & V, 1982 */
-
-    ipos = 0;
-    for (nsamp = 0; nsamp < nSamples; nsamp++) {
-        x = fdata[ipos++];
-        y = fdata[ipos++];
-        z = fdata[ipos++];
-        ipos++; //prob = fdata[ipos++];
-
-        cov.xx += (double) (x * x);
-        cov.xy += (double) (x * y);
-        cov.xz += (double) (x * z);
-
-        cov.yy += (double) (y * y);
-        cov.yz += (double) (y * z);
-
-        cov.zz += (double) (z * z);
-
-    }
-
-    cov.xx = cov.xx / (double) nSamples - pexpect->x * pexpect->x;
-    cov.xy = cov.xy / (double) nSamples - pexpect->x * pexpect->y;
-    cov.xz = cov.xz / (double) nSamples - pexpect->x * pexpect->z;
-
-    cov.yx = cov.xy;
-    cov.yy = cov.yy / (double) nSamples - pexpect->y * pexpect->y;
-    cov.yz = cov.yz / (double) nSamples - pexpect->y * pexpect->z;
-
-    cov.zx = cov.xz;
-    cov.zy = cov.yz;
-    cov.zz = cov.zz / (double) nSamples - pexpect->z * pexpect->z;
 
 
     return (cov);
@@ -408,251 +249,6 @@ Mtrx3D CalcCovarianceSamplesGlobal(float* fdata, int nSamples, Vect3D* pexpect) 
     cov.zx = cov.xz;
     cov.zy = cov.yz;
     cov.zz = cov.zz / (double) nSamples;
-
-
-    return (cov);
-}
-
-/** function to calculate the covariance of a set of samples in long(deg)/lat(deg)/depth(km) coordinates
- * samples assumed to be distributed following a target PDF
- *
- * 20141030 AJL - Bug fix: new version which subtracts the expectation from each data value before summing,
- *      instead of correcting for expectation after summing and dividing by nSamples.
- *      Should prevent precision errors when expectation is far from coordinates origin.
- */
-
-Mtrx3D CalcCovarianceSamplesGlobal_NEW(float* fdata, int nSamples, Vect3D* pexpect) {
-    //Mtrx3D CalcCovarianceSamplesGlobal(float* fdata, int nSamples, Vect3D* pexpect) {
-
-    int nsamp, ipos;
-
-    float x, y, z;
-//    float prob;
-
-    Mtrx3D cov = {0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0};
-
-    double cos_lat = cos(pexpect->y * DE2RA);
-    double xReference = pexpect->x;
-
-    /* calculate covariance following eq. (6-12), T & V, 1982 */
-
-    ipos = 0;
-    for (nsamp = 0; nsamp < nSamples; nsamp++) {
-        x = fdata[ipos++];
-        if (x - xReference > 180.0)
-            x -= 360.0;
-        else if (x - xReference < -180.0)
-            x += 360.0;
-        x = (x - pexpect->x) * DEG2KM * cos_lat;
-        y = (fdata[ipos++] - pexpect->y) * DEG2KM;
-        z = (fdata[ipos++] - pexpect->z);
-        ipos++; //prob = fdata[ipos++]; // do not use prob since samples follow target PDF
-
-        cov.xx += (double) (x * x);
-        cov.xy += (double) (x * y);
-        cov.xz += (double) (x * z);
-
-        cov.yy += (double) (y * y);
-        cov.yz += (double) (y * z);
-
-        cov.zz += (double) (z * z);
-
-    }
-
-    cov.xx = cov.xx / (double) nSamples;
-    cov.xy = cov.xy / (double) nSamples;
-    cov.xz = cov.xz / (double) nSamples;
-
-    cov.yx = cov.xy;
-    cov.yy = cov.yy / (double) nSamples;
-    cov.yz = cov.yz / (double) nSamples;
-
-    cov.zx = cov.xz;
-    cov.zy = cov.yz;
-    cov.zz = cov.zz / (double) nSamples;
-
-
-    return (cov);
-}
-
-/** function to calculate the covariance of a set of samples in long(deg)/lat(deg)/depth(km) coordinates
- *
- * !!! DO NOT USE - subject to precision errors!
- */
-
-Mtrx3D CalcCovarianceSamplesGlobal_OLD(float* fdata, int nSamples, Vect3D* pexpect) {
-    //Mtrx3D CalcCovarianceSamplesGlobal(float* fdata, int nSamples, Vect3D* pexpect) {
-
-    int nsamp, ipos;
-
-    float x, y, z;
-//    float prob;
-
-    Mtrx3D cov = {0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0};
-
-    double cos_lat = cos(pexpect->y * DE2RA);
-    double xReference = pexpect->x;
-
-    /* calculate covariance following eq. (6-12), T & V, 1982 */
-
-    ipos = 0;
-    for (nsamp = 0; nsamp < nSamples; nsamp++) {
-        x = fdata[ipos++];
-        if (x - xReference > 180.0)
-            x -= 360.0;
-        else if (x - xReference < -180.0)
-            x += 360.0;
-        x = x * DEG2KM * cos_lat;
-        y = fdata[ipos++] * DEG2KM;
-        z = fdata[ipos++];
-//        ipos++; //prob = fdata[ipos++];
-
-        cov.xx += (double) (x * x);
-        cov.xy += (double) (x * y);
-        cov.xz += (double) (x * z);
-
-        cov.yy += (double) (y * y);
-        cov.yz += (double) (y * z);
-
-        cov.zz += (double) (z * z);
-
-    }
-
-    cov.xx = cov.xx / (double) nSamples - pexpect->x * pexpect->x * DEG2KM * cos_lat * DEG2KM * cos_lat;
-    cov.xy = cov.xy / (double) nSamples - pexpect->x * pexpect->y * DEG2KM * cos_lat * DEG2KM;
-    cov.xz = cov.xz / (double) nSamples - pexpect->x * pexpect->z * DEG2KM * cos_lat;
-
-    cov.yx = cov.xy;
-    cov.yy = cov.yy / (double) nSamples - pexpect->y * pexpect->y * DEG2KM * DEG2KM;
-    cov.yz = cov.yz / (double) nSamples - pexpect->y * pexpect->z * DEG2KM;
-
-    cov.zx = cov.xz;
-    cov.zy = cov.yz;
-    cov.zz = cov.zz / (double) nSamples - pexpect->z * pexpect->z;
-
-
-    return (cov);
-}
-
-/** function to calculate the covariance of a set of samples in long(deg)/lat(deg)/depth(km) coordinates
- *
- * 20141030 AJL - Bug fix: new version which subtracts the expectation from each data value before summing,
- *      instead of correcting for expectation after summing and dividing by nSamples.
- *      Should prevent precision errors when expectation is far from coordinates origin.
- */
-
-Mtrx3D CalcCovarianceSamplesGlobalWeighted(float* fdata, int nSamples, Vect3D* pexpect) {
-
-    int nsamp, ipos;
-
-    double x, y, z;
-    Mtrx3D cov = {0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0};
-
-    double weight;
-    double weight_sum = 0.0;
-
-    double cos_lat = cos(pexpect->y * DE2RA);
-    double xReference = pexpect->x;
-
-    /* calculate covariance following eq. (6-12), T & V, 1982 */
-
-    ipos = 0;
-    for (nsamp = 0; nsamp < nSamples; nsamp++) {
-        x = fdata[ipos++];
-        if (x - xReference > 180.0)
-            x -= 360.0;
-        else if (x - xReference < -180.0)
-            x += 360.0;
-        x = (x - pexpect->x) * DEG2KM * cos_lat;
-        y = (fdata[ipos++] - pexpect->y) * DEG2KM;
-        z = (fdata[ipos++] - pexpect->z);
-        weight = fdata[ipos++];
-
-        cov.xx += (x * x) * weight;
-        cov.xy += (x * y) * weight;
-        cov.xz += (x * z) * weight;
-
-        cov.yy += (y * y) * weight;
-        cov.yz += (y * z) * weight;
-
-        cov.zz += (z * z) * weight;
-
-        weight_sum += weight;
-
-    }
-
-    cov.xx = cov.xx / weight_sum;
-    cov.xy = cov.xy / weight_sum;
-    cov.xz = cov.xz / weight_sum;
-
-    cov.yx = cov.xy;
-    cov.yy = cov.yy / weight_sum;
-    cov.yz = cov.yz / weight_sum;
-
-    cov.zx = cov.xz;
-    cov.zy = cov.yz;
-    cov.zz = cov.zz / weight_sum;
-
-
-    return (cov);
-}
-
-/** function to calculate the covariance of a set of samples in long(deg)/lat(deg)/depth(km) coordinates
- *
- * !!! DO NOT USE - subject to precision errors!
- */
-
-Mtrx3D CalcCovarianceSamplesGlobalWeighted_OLD(float* fdata, int nSamples, Vect3D* pexpect) {
-
-    int nsamp, ipos;
-
-    double x, y, z;
-    Mtrx3D cov = {0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0};
-
-    double weight;
-    double weight_sum = 0.0;
-
-    double cos_lat = cos(pexpect->y * DE2RA);
-    double xReference = pexpect->x;
-
-    /* calculate covariance following eq. (6-12), T & V, 1982 */
-
-    ipos = 0;
-    for (nsamp = 0; nsamp < nSamples; nsamp++) {
-        x = fdata[ipos++];
-        if (x - xReference > 180.0)
-            x -= 360.0;
-        else if (x - xReference < -180.0)
-            x += 360.0;
-        x = x * DEG2KM * cos_lat;
-        y = fdata[ipos++] * DEG2KM;
-        z = fdata[ipos++];
-        weight = fdata[ipos++];
-
-        cov.xx += (x * x) * weight;
-        cov.xy += (x * y) * weight;
-        cov.xz += (x * z) * weight;
-
-        cov.yy += (y * y) * weight;
-        cov.yz += (y * z) * weight;
-
-        cov.zz += (z * z) * weight;
-
-        weight_sum += weight;
-
-    }
-
-    cov.xx = cov.xx / weight_sum - pexpect->x * pexpect->x * DEG2KM * cos_lat * DEG2KM * cos_lat;
-    cov.xy = cov.xy / weight_sum - pexpect->x * pexpect->y * DEG2KM * cos_lat * DEG2KM;
-    cov.xz = cov.xz / weight_sum - pexpect->x * pexpect->z * DEG2KM * cos_lat;
-
-    cov.yx = cov.xy;
-    cov.yy = cov.yy / weight_sum - pexpect->y * pexpect->y * DEG2KM * DEG2KM;
-    cov.yz = cov.yz / weight_sum - pexpect->y * pexpect->z * DEG2KM;
-
-    cov.zx = cov.xz;
-    cov.zy = cov.yz;
-    cov.zz = cov.zz / weight_sum - pexpect->z * pexpect->z;
 
 
     return (cov);
@@ -903,64 +499,6 @@ void ellipsiod2Axes(Ellipsoid3D *pellipsoid, Vect3D *paxis1, Vect3D *paxis2, Vec
 
 }
 
-/** method to convert ellipsoid to an XML (pseudo-QuakeML) ConfidenceEllipsoid
- *
- *  !!! Very incomplete.  Only converts NLL Ellipsoid axes parameters minor(3)/intermediate(3)/major(1) to
- *      major(3)/intermediate(3)/minor(1) ordering
-
- */
-
-void nllEllipsiod2XMLConfidenceEllipsoid(Ellipsoid3D *pellipsoid,
-        double* psemiMajorAxisLength, double* pmajorAxisPlunge, double* pmajorAxisAzimuth,
-        double* psemiIntermediateAxisLength, double* pintermediateAxisPlunge, double* pintermediateAxisAzimuth,
-        double* psemiMinorAxisLength) {
-
-    Vect3D axis1;
-    Vect3D axis2;
-    Vect3D axis3;
-    ellipsiod2Axes(pellipsoid, &axis1, &axis2, &axis3);
-
-    *psemiMajorAxisLength = pellipsoid->len3;
-    *psemiIntermediateAxisLength = pellipsoid->len2;
-    *psemiMinorAxisLength = pellipsoid->len1;
-
-    double plunge = axis3.z >= 0.0 ? 90.0 : -90.0;
-    double hypot = sqrt(axis3.x * axis3.x + axis3.y * axis3.y);
-    if (hypot > FLT_MIN) {
-        plunge = RA2DE * atan(axis3.z / hypot);
-    }
-    double azim = RA2DE * atan2(axis3.x, axis3.y);
-    if (azim < 0.0)
-        azim += 360.0;
-    if (plunge < 0.0) {
-        plunge *= -1.0;
-        azim -= 180.0;
-        if (azim < 0.0)
-            azim += 360.0;
-    }
-    *pmajorAxisPlunge = plunge;
-    *pmajorAxisAzimuth = azim;
-
-
-    plunge = axis2.z >= 0.0 ? 90.0 : -90.0;
-    hypot = sqrt(axis2.x * axis2.x + axis2.y * axis2.y);
-    if (hypot > FLT_MIN) {
-        plunge = RA2DE * atan(axis2.z / hypot);
-    }
-    azim = RA2DE * atan2(axis2.x, axis2.y);
-    if (azim < 0.0)
-        azim += 360.0;
-    if (plunge < 0.0) {
-        plunge *= -1.0;
-        azim -= 180.0;
-        if (azim < 0.0)
-            azim += 360.0;
-    }
-    *pintermediateAxisPlunge = plunge;
-    *pintermediateAxisAzimuth = azim;
-
-}
-
 /** method to perform dot product on two 3x3 matrices
  *
  * WARING: no check if input matrices are 3x3!
@@ -1185,4 +723,470 @@ int nllEllipsiod2QMLConfidenceEllipsoid(Ellipsoid3D *pellipsoid,
 
 }
 
+#ifdef NLL_DEAD_CODE
+
+/** function to calculate the covariance of a set of samples in long(deg)/lat(deg)/depth(km) coordinates
+ * samples assumed to be distributed following a target PDF
+ *
+ * 20141030 AJL - Bug fix: new version which subtracts the expectation from each data value before summing,
+ *      instead of correcting for expectation after summing and dividing by nSamples.
+ *      Should prevent precision errors when expectation is far from coordinates origin.
+ */
+
+Mtrx3D CalcCovarianceSamplesGlobal_NEW(float* fdata, int nSamples, Vect3D* pexpect) {
+    //Mtrx3D CalcCovarianceSamplesGlobal(float* fdata, int nSamples, Vect3D* pexpect) {
+
+    int nsamp, ipos;
+
+    float x, y, z;
+//    float prob;
+
+    Mtrx3D cov = {0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0};
+
+    double cos_lat = cos(pexpect->y * DE2RA);
+    double xReference = pexpect->x;
+
+    /* calculate covariance following eq. (6-12), T & V, 1982 */
+
+    ipos = 0;
+    for (nsamp = 0; nsamp < nSamples; nsamp++) {
+        x = fdata[ipos++];
+        if (x - xReference > 180.0)
+            x -= 360.0;
+        else if (x - xReference < -180.0)
+            x += 360.0;
+        x = (x - pexpect->x) * DEG2KM * cos_lat;
+        y = (fdata[ipos++] - pexpect->y) * DEG2KM;
+        z = (fdata[ipos++] - pexpect->z);
+        ipos++; //prob = fdata[ipos++]; // do not use prob since samples follow target PDF
+
+        cov.xx += (double) (x * x);
+        cov.xy += (double) (x * y);
+        cov.xz += (double) (x * z);
+
+        cov.yy += (double) (y * y);
+        cov.yz += (double) (y * z);
+
+        cov.zz += (double) (z * z);
+
+    }
+
+    cov.xx = cov.xx / (double) nSamples;
+    cov.xy = cov.xy / (double) nSamples;
+    cov.xz = cov.xz / (double) nSamples;
+
+    cov.yx = cov.xy;
+    cov.yy = cov.yy / (double) nSamples;
+    cov.yz = cov.yz / (double) nSamples;
+
+    cov.zx = cov.xz;
+    cov.zy = cov.yz;
+    cov.zz = cov.zz / (double) nSamples;
+
+
+    return (cov);
+}
+
+/** function to calculate the covariance of a set of samples in long(deg)/lat(deg)/depth(km) coordinates
+ *
+ * !!! DO NOT USE - subject to precision errors!
+ */
+
+Mtrx3D CalcCovarianceSamplesGlobal_OLD(float* fdata, int nSamples, Vect3D* pexpect) {
+    //Mtrx3D CalcCovarianceSamplesGlobal(float* fdata, int nSamples, Vect3D* pexpect) {
+
+    int nsamp, ipos;
+
+    float x, y, z;
+//    float prob;
+
+    Mtrx3D cov = {0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0};
+
+    double cos_lat = cos(pexpect->y * DE2RA);
+    double xReference = pexpect->x;
+
+    /* calculate covariance following eq. (6-12), T & V, 1982 */
+
+    ipos = 0;
+    for (nsamp = 0; nsamp < nSamples; nsamp++) {
+        x = fdata[ipos++];
+        if (x - xReference > 180.0)
+            x -= 360.0;
+        else if (x - xReference < -180.0)
+            x += 360.0;
+        x = x * DEG2KM * cos_lat;
+        y = fdata[ipos++] * DEG2KM;
+        z = fdata[ipos++];
+//        ipos++; //prob = fdata[ipos++];
+
+        cov.xx += (double) (x * x);
+        cov.xy += (double) (x * y);
+        cov.xz += (double) (x * z);
+
+        cov.yy += (double) (y * y);
+        cov.yz += (double) (y * z);
+
+        cov.zz += (double) (z * z);
+
+    }
+
+    cov.xx = cov.xx / (double) nSamples - pexpect->x * pexpect->x * DEG2KM * cos_lat * DEG2KM * cos_lat;
+    cov.xy = cov.xy / (double) nSamples - pexpect->x * pexpect->y * DEG2KM * cos_lat * DEG2KM;
+    cov.xz = cov.xz / (double) nSamples - pexpect->x * pexpect->z * DEG2KM * cos_lat;
+
+    cov.yx = cov.xy;
+    cov.yy = cov.yy / (double) nSamples - pexpect->y * pexpect->y * DEG2KM * DEG2KM;
+    cov.yz = cov.yz / (double) nSamples - pexpect->y * pexpect->z * DEG2KM;
+
+    cov.zx = cov.xz;
+    cov.zy = cov.yz;
+    cov.zz = cov.zz / (double) nSamples - pexpect->z * pexpect->z;
+
+
+    return (cov);
+}
+
+/** function to calculate the covariance of a set of samples in long(deg)/lat(deg)/depth(km) coordinates
+ *
+ * 20141030 AJL - Bug fix: new version which subtracts the expectation from each data value before summing,
+ *      instead of correcting for expectation after summing and dividing by nSamples.
+ *      Should prevent precision errors when expectation is far from coordinates origin.
+ */
+
+Mtrx3D CalcCovarianceSamplesGlobalWeighted(float* fdata, int nSamples, Vect3D* pexpect) {
+
+    int nsamp, ipos;
+
+    double x, y, z;
+    Mtrx3D cov = {0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0};
+
+    double weight;
+    double weight_sum = 0.0;
+
+    double cos_lat = cos(pexpect->y * DE2RA);
+    double xReference = pexpect->x;
+
+    /* calculate covariance following eq. (6-12), T & V, 1982 */
+
+    ipos = 0;
+    for (nsamp = 0; nsamp < nSamples; nsamp++) {
+        x = fdata[ipos++];
+        if (x - xReference > 180.0)
+            x -= 360.0;
+        else if (x - xReference < -180.0)
+            x += 360.0;
+        x = (x - pexpect->x) * DEG2KM * cos_lat;
+        y = (fdata[ipos++] - pexpect->y) * DEG2KM;
+        z = (fdata[ipos++] - pexpect->z);
+        weight = fdata[ipos++];
+
+        cov.xx += (x * x) * weight;
+        cov.xy += (x * y) * weight;
+        cov.xz += (x * z) * weight;
+
+        cov.yy += (y * y) * weight;
+        cov.yz += (y * z) * weight;
+
+        cov.zz += (z * z) * weight;
+
+        weight_sum += weight;
+
+    }
+
+    cov.xx = cov.xx / weight_sum;
+    cov.xy = cov.xy / weight_sum;
+    cov.xz = cov.xz / weight_sum;
+
+    cov.yx = cov.xy;
+    cov.yy = cov.yy / weight_sum;
+    cov.yz = cov.yz / weight_sum;
+
+    cov.zx = cov.xz;
+    cov.zy = cov.yz;
+    cov.zz = cov.zz / weight_sum;
+
+
+    return (cov);
+}
+
+/** function to calculate the covariance of a set of samples in long(deg)/lat(deg)/depth(km) coordinates
+ *
+ * !!! DO NOT USE - subject to precision errors!
+ */
+
+Mtrx3D CalcCovarianceSamplesGlobalWeighted_OLD(float* fdata, int nSamples, Vect3D* pexpect) {
+
+    int nsamp, ipos;
+
+    double x, y, z;
+    Mtrx3D cov = {0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0};
+
+    double weight;
+    double weight_sum = 0.0;
+
+    double cos_lat = cos(pexpect->y * DE2RA);
+    double xReference = pexpect->x;
+
+    /* calculate covariance following eq. (6-12), T & V, 1982 */
+
+    ipos = 0;
+    for (nsamp = 0; nsamp < nSamples; nsamp++) {
+        x = fdata[ipos++];
+        if (x - xReference > 180.0)
+            x -= 360.0;
+        else if (x - xReference < -180.0)
+            x += 360.0;
+        x = x * DEG2KM * cos_lat;
+        y = fdata[ipos++] * DEG2KM;
+        z = fdata[ipos++];
+        weight = fdata[ipos++];
+
+        cov.xx += (x * x) * weight;
+        cov.xy += (x * y) * weight;
+        cov.xz += (x * z) * weight;
+
+        cov.yy += (y * y) * weight;
+        cov.yz += (y * z) * weight;
+
+        cov.zz += (z * z) * weight;
+
+        weight_sum += weight;
+
+    }
+
+    cov.xx = cov.xx / weight_sum - pexpect->x * pexpect->x * DEG2KM * cos_lat * DEG2KM * cos_lat;
+    cov.xy = cov.xy / weight_sum - pexpect->x * pexpect->y * DEG2KM * cos_lat * DEG2KM;
+    cov.xz = cov.xz / weight_sum - pexpect->x * pexpect->z * DEG2KM * cos_lat;
+
+    cov.yx = cov.xy;
+    cov.yy = cov.yy / weight_sum - pexpect->y * pexpect->y * DEG2KM * DEG2KM;
+    cov.yz = cov.yz / weight_sum - pexpect->y * pexpect->z * DEG2KM;
+
+    cov.zx = cov.xz;
+    cov.zy = cov.yz;
+    cov.zz = cov.zz / weight_sum - pexpect->z * pexpect->z;
+
+
+    return (cov);
+}
+
+/** function to calculate the covariance of a set of samples
+ *
+ * !!! DO NOT USE - subject to precision errors!
+ */
+
+Mtrx3D CalcCovarianceSamplesRect_OLD(float* fdata, int nSamples, Vect3D* pexpect) {
+
+    int nsamp, ipos;
+
+    float x, y, z;
+//    float prob;
+
+    Mtrx3D cov = {0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0};
+
+
+    /* calculate covariance following eq. (6-12), T & V, 1982 */
+
+    ipos = 0;
+    for (nsamp = 0; nsamp < nSamples; nsamp++) {
+        x = fdata[ipos++];
+        y = fdata[ipos++];
+        z = fdata[ipos++];
+        ipos++; //prob = fdata[ipos++];
+
+        cov.xx += (double) (x * x);
+        cov.xy += (double) (x * y);
+        cov.xz += (double) (x * z);
+
+        cov.yy += (double) (y * y);
+        cov.yz += (double) (y * z);
+
+        cov.zz += (double) (z * z);
+
+    }
+
+    cov.xx = cov.xx / (double) nSamples - pexpect->x * pexpect->x;
+    cov.xy = cov.xy / (double) nSamples - pexpect->x * pexpect->y;
+    cov.xz = cov.xz / (double) nSamples - pexpect->x * pexpect->z;
+
+    cov.yx = cov.xy;
+    cov.yy = cov.yy / (double) nSamples - pexpect->y * pexpect->y;
+    cov.yz = cov.yz / (double) nSamples - pexpect->y * pexpect->z;
+
+    cov.zx = cov.xz;
+    cov.zy = cov.yz;
+    cov.zz = cov.zz / (double) nSamples - pexpect->z * pexpect->z;
+
+
+    return (cov);
+}
+
+/** function to calculate the expectation (mean) of a set of samples (lon,lat,depth,weight)
+ *
+ * global case - checks for wrap around in longitude (x) using specified xReference as correct longitude zone
+ * TODO: uses rectangular lat/lon geometry, does not try and correct for change in longitude distance with latitude.
+ * TODO: does not try and correct for problems in latitude near poles.
+ *
+ */
+
+Vect3D CalcExpectationSamplesGlobal(float* fdata, int nSamples, double xReference) {
+
+    int nsamp, ipos;
+
+    double x, y, z;
+    Vect3D expect = {0.0, 0.0, 0.0};
+
+    ipos = 0;
+    for (nsamp = 0; nsamp < nSamples; nsamp++) {
+        x = fdata[ipos++];
+        if (x - xReference > 180.0)
+            x -= 360.0;
+        else if (x - xReference < -180.0)
+            x += 360.0;
+        y = fdata[ipos++];
+        z = fdata[ipos++];
+        ipos++; // fdata value is in 4th position
+        expect.x += x;
+        expect.y += y;
+        expect.z += z;
+    }
+
+    expect.x /= (double) nSamples;
+    expect.y /= (double) nSamples;
+    expect.z /= (double) nSamples;
+
+    return (expect);
+}
+
+/** function to calculate the weighted expectation (mean) of a set of samples (lon,lat,depth,weight)
+ *
+ * global case - checks for wrap around in longitude (x) using specified xReference as correct longitude zone
+ * TODO: does not try and correct for problems in latitude near poles.
+ *
+ */
+
+Vect3D CalcExpectationSamplesGlobalWeighted(float* fdata, int nSamples, double xReference) {
+
+    int nsamp, ipos;
+
+    double x, y, z;
+    Vect3D expect = {0.0, 0.0, 0.0};
+
+    double weight;
+    double weight_sum = 0.0;
+
+    ipos = 0;
+    for (nsamp = 0; nsamp < nSamples; nsamp++) {
+        x = fdata[ipos++];
+        if (x - xReference > 180.0)
+            x -= 360.0;
+        else if (x - xReference < -180.0)
+            x += 360.0;
+        y = fdata[ipos++];
+        z = fdata[ipos++];
+        weight = fdata[ipos++];
+        expect.x += x * weight;
+        expect.y += y * weight;
+        expect.z += z * weight;
+        weight_sum += weight;
+    }
+
+    expect.x /= weight_sum;
+    expect.y /= weight_sum;
+    expect.z /= weight_sum;
+
+    return (expect);
+}
+
+/** function to calculate the expectation (mean)  of a set of samples */
+
+Vect3D CalcExpectationSamplesWeighted(float* fdata, int nSamples) {
+
+    int nsamp, ipos;
+
+    float x, y, z;
+    Vect3D expect = {0.0, 0.0, 0.0};
+
+    double weight;
+    double weight_sum = 0.0;
+
+    ipos = 0;
+    for (nsamp = 0; nsamp < nSamples; nsamp++) {
+        x = fdata[ipos++];
+        y = fdata[ipos++];
+        z = fdata[ipos++];
+        weight = fdata[ipos++];
+        expect.x += (double) x * weight;
+        expect.y += (double) y * weight;
+        expect.z += (double) z * weight;
+        weight_sum += weight;
+    }
+
+    expect.x /= weight_sum;
+    expect.y /= weight_sum;
+    expect.z /= weight_sum;
+
+    return (expect);
+}
+
+/** method to convert ellipsoid to an XML (pseudo-QuakeML) ConfidenceEllipsoid
+ *
+ *  !!! Very incomplete.  Only converts NLL Ellipsoid axes parameters minor(3)/intermediate(3)/major(1) to
+ *      major(3)/intermediate(3)/minor(1) ordering
+
+ */
+
+void nllEllipsiod2XMLConfidenceEllipsoid(Ellipsoid3D *pellipsoid,
+        double* psemiMajorAxisLength, double* pmajorAxisPlunge, double* pmajorAxisAzimuth,
+        double* psemiIntermediateAxisLength, double* pintermediateAxisPlunge, double* pintermediateAxisAzimuth,
+        double* psemiMinorAxisLength) {
+
+    Vect3D axis1;
+    Vect3D axis2;
+    Vect3D axis3;
+    ellipsiod2Axes(pellipsoid, &axis1, &axis2, &axis3);
+
+    *psemiMajorAxisLength = pellipsoid->len3;
+    *psemiIntermediateAxisLength = pellipsoid->len2;
+    *psemiMinorAxisLength = pellipsoid->len1;
+
+    double plunge = axis3.z >= 0.0 ? 90.0 : -90.0;
+    double hypot = sqrt(axis3.x * axis3.x + axis3.y * axis3.y);
+    if (hypot > FLT_MIN) {
+        plunge = RA2DE * atan(axis3.z / hypot);
+    }
+    double azim = RA2DE * atan2(axis3.x, axis3.y);
+    if (azim < 0.0)
+        azim += 360.0;
+    if (plunge < 0.0) {
+        plunge *= -1.0;
+        azim -= 180.0;
+        if (azim < 0.0)
+            azim += 360.0;
+    }
+    *pmajorAxisPlunge = plunge;
+    *pmajorAxisAzimuth = azim;
+
+
+    plunge = axis2.z >= 0.0 ? 90.0 : -90.0;
+    hypot = sqrt(axis2.x * axis2.x + axis2.y * axis2.y);
+    if (hypot > FLT_MIN) {
+        plunge = RA2DE * atan(axis2.z / hypot);
+    }
+    azim = RA2DE * atan2(axis2.x, axis2.y);
+    if (azim < 0.0)
+        azim += 360.0;
+    if (plunge < 0.0) {
+        plunge *= -1.0;
+        azim -= 180.0;
+        if (azim < 0.0)
+            azim += 360.0;
+    }
+    *pintermediateAxisPlunge = plunge;
+    *pintermediateAxisAzimuth = azim;
+
+}
+
+
+#endif //NLL_DEAD_CODE
 

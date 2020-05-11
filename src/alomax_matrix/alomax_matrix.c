@@ -7,7 +7,7 @@
 
 #include "alomax_matrix.h"
 
-#include "eigv.h"
+//#include "eigv.h"
 
 #include <stdlib.h>
 #include <stdio.h>
@@ -23,11 +23,6 @@
 #define EPSILON  FLT_MIN
 
 static char error_message[4096];
-
-/** function to print error and return last error message */
-char *get_matrix_error_mesage() {
-    return (error_message);
-}
 
 MatrixDouble matrix_double(int nrow, int ncol) {
     MatrixDouble mtx;
@@ -113,18 +108,6 @@ void free_vector_double(VectorDouble vect) {
 
 }
 
-/** function  to display double matrix */
-
-void display_vector_double(char* name, VectorDouble vect, int nsize) {
-    int n;
-
-    fprintf(stdout, "\n%s Vector: %d elements\n", name, nsize);
-    for (n = 0; n < nsize; n++) {
-        fprintf(stdout, "%g ", vect[n]);
-    }
-    fprintf(stdout, "\n");
-
-}
 
 /*
  * Simple Gauss-Jordan elimination
@@ -249,6 +232,9 @@ int matrix_double_inverse(MatrixDouble dmtx, int num_rows, int num_cols) {
     return (istat);
 
 }
+
+
+#ifdef NLL_DEAD_CODE
 
 /*
  *   return the inv of the square matrix M for the rows/columns which have non-zero diagonal
@@ -423,9 +409,23 @@ int square_inverse_not_ok(MatrixDouble inverse_mtrx, MatrixDouble original_mtx, 
 
 }
 
-#undef EPSILON
-#undef EPSILON_BIG
+/** function  to display double matrix */
 
+void display_vector_double(char* name, VectorDouble vect, int nsize) {
+    int n;
+
+    fprintf(stdout, "\n%s Vector: %d elements\n", name, nsize);
+    for (n = 0; n < nsize; n++) {
+        fprintf(stdout, "%g ", vect[n]);
+    }
+    fprintf(stdout, "\n");
+
+}
+
+/** function to print error and return last error message */
+char *get_matrix_error_mesage() {
+    return (error_message);
+}
 
 /**
  *  Helper function to apply real symmetric eigen decomposition
@@ -441,7 +441,7 @@ int square_inverse_not_ok(MatrixDouble inverse_mtrx, MatrixDouble original_mtx, 
  *   error code or zero on normal completion
  *
  */
-
+/*
 int real_symmetric_eigen_helper(MatrixDouble A_matrix, int isize, VectorDouble S_vector, MatrixDouble V_matrix) {
 
     int i, j;
@@ -482,5 +482,9 @@ int real_symmetric_eigen_helper(MatrixDouble A_matrix, int isize, VectorDouble S
     return (istat);
 
 }
+*/
 
+#endif //NLL_DEAD_CODE
 
+#undef EPSILON
+#undef EPSILON_BIG

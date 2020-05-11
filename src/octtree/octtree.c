@@ -74,22 +74,14 @@ OctNode* getLeafContaining(OctNode* node, double x, double y, double z);
 
 ResultTreeNode* addResult(ResultTreeNode* prtn, double value, double volume, OctNode* pnode);
 void freeResultTree(ResultTreeNode* prtn);
-ResultTreeNode* getHighestValue(ResultTreeNode* prtn);
 ResultTreeNode* getHighestLeafValue(ResultTreeNode* prtree);
 ResultTreeNode* getHighestLeafValueMinSize(ResultTreeNode* prtree, double sizeMinX, double sizeMinY, double sizeMinZ);
-ResultTreeNode* getHighestLeafValueLESpecifiedSize(ResultTreeNode* prtree, double sizeX, double sizeY, double sizeZ);
-ResultTreeNode* getHighestLeafValueOfSpecifiedSize(ResultTreeNode* prtree, double sizeX, double sizeY, double sizeZ);
-ResultTreeNode* getHighestLeafValueAtSpecifiedLevel(ResultTreeNode* prtree, int level);
-ResultTreeNode* getHighestLeafValueLESpecifiedLevel(ResultTreeNode* prtree, int level);
-ResultTreeNode* getHighestLeafValueGESpecifiedLevel(ResultTreeNode* prtree, int level);
 
 Tree3D* readTree3D(FILE *fpio);
 int readNode(FILE *fpio, OctNode* node);
 int writeTree3D(FILE *fpio, Tree3D* tree);
 int writeNode(FILE *fpio, OctNode* node);
 
-int nodeContains(OctNode* node, double x, double y, double z);
-int extendedNodeContains(OctNode* node, double x, double y, double z, int checkZ);
 
 int getScatterSampleResultTreeAtLevels(ResultTreeNode* prtree, int value_type, int num_scatter,
         double integral, float* fdata, int npoints, int* pfdata_index,
@@ -100,7 +92,6 @@ int getScatterSampleResultTree(ResultTreeNode* prtree, int value_type, int num_s
 double convertOcttreeValuesToProb(ResultTreeNode* prtree, double sum, double oct_node_value_max);
 double integrateResultTreeAtLevels(ResultTreeNode* prtree, int value_type, double sum, double oct_node_value_max, int level_min, int level_max);
 double integrateResultTree(ResultTreeNode* prtree, int value_type, double sum, double oct_node_value_max);
-ResultTreeNode* createResultTree(ResultTreeNode* prtree, ResultTreeNode* pnew_rtree);
 
 /*------------------------------------------------------------/ */
 
@@ -497,60 +488,6 @@ OctNode* getLeafContaining(OctNode* node, double x, double y, double z) {
 
 }
 
-/*** function to check if node contains the given x, y, z coordinates ***/
-
-int nodeContains(OctNode* node, double x, double y, double z) {
-
-    Vect3D ds;
-    double dx2, dy2, dz2;
-
-    ds = node->ds;
-
-    dx2 = ds.x / 2.0;
-    if (x < node->center.x - dx2 || x > node->center.x + dx2)
-        return (0);
-
-    dy2 = ds.y / 2.0;
-    if (y < node->center.y - dy2 || y > node->center.y + dy2)
-        return (0);
-
-    dz2 = ds.z / 2.0;
-    if (z < node->center.z - dz2 || z > node->center.z + dz2)
-
-        return (0);
-
-    return (1);
-
-}
-
-/*** function to check if node or half-segments of adjacent equal-size nodes contains the given x, y, z coordinates ***/
-
-int extendedNodeContains(OctNode* node, double x, double y, double z, int checkZ) {
-
-    Vect3D ds;
-    double dx2, dy2, dz2;
-
-    ds = node->ds;
-
-    dx2 = ds.x;
-    if (x < node->center.x - dx2 || x > node->center.x + dx2)
-        return (0);
-
-    dy2 = ds.y;
-    if (y < node->center.y - dy2 || y > node->center.y + dy2)
-        return (0);
-
-    if (checkZ) {
-        dz2 = ds.z;
-        if (z < node->center.z - dz2 || z > node->center.z + dz2)
-
-            return (0);
-    }
-
-    return (1);
-
-}
-
 /*** function to put Octtree node in results tree in order of value */
 
 ResultTreeNode* addResult(ResultTreeNode* prtree, double value, double volume, OctNode* pnode) {
@@ -598,19 +535,6 @@ void freeResultTree(ResultTreeNode* prtree) {
     if (prtree->right != NULL)
         freeResultTree(prtree->right);
     free(prtree);
-}
-
-/*** function to get ResultTreeNode with highest value */
-
-ResultTreeNode* getHighestValue(ResultTreeNode* prtree) {
-
-    if (prtree == NULL)
-        return (NULL);
-
-    if (prtree->right == NULL) /* right child is empty */
-        return (prtree);
-
-    return (getHighestValue(prtree->right));
 }
 
 /*** function to get ResultTree Leaf Node with highest value */
@@ -668,127 +592,6 @@ ResultTreeNode* getHighestLeafValueMinSize(ResultTreeNode* prtree, double sizeMi
 
 
 #define SIZE_TOLERANCE 1.0e-20
-
-/*** function to get ResultTree Leaf Node with highest value, node size must be less than or equal to specified maximum size */
-
-ResultTreeNode* getHighestLeafValueLESpecifiedSize(ResultTreeNode* prtree, double sizeX, double sizeY, double sizeZ) {
-
-    ResultTreeNode* prtree_returned = NULL;
-
-    if (prtree->right != NULL)
-        prtree_returned = getHighestLeafValueLESpecifiedSize(prtree->right, sizeX, sizeY, sizeZ);
-
-    if (prtree_returned != NULL) // right leaf descendent
-        return (prtree_returned); // thus highest value leaf
-    else { // no right leaf descendents
-        if (prtree->pnode->isLeaf // this is leaf
-                && ((sizeX < 0.0) || (prtree->pnode->ds.x - sizeX < SIZE_TOLERANCE))
-                && ((sizeY < 0.0) || (prtree->pnode->ds.y - sizeY < SIZE_TOLERANCE))
-                && ((sizeZ < 0.0) || (prtree->pnode->ds.z - sizeZ < SIZE_TOLERANCE))
-                ) // is specified size
-            return (prtree); // thus highest value leaf that is not too small
-    }
-
-    if (prtree->left != NULL) // look for left leaf descendents
-        prtree_returned = getHighestLeafValueLESpecifiedSize(prtree->left, sizeX, sizeY, sizeZ);
-
-    return (prtree_returned);
-}
-
-/*** function to get ResultTree Leaf Node with highest value, node size must be equal to specified maximum size */
-
-ResultTreeNode* getHighestLeafValueOfSpecifiedSize(ResultTreeNode* prtree, double sizeX, double sizeY, double sizeZ) {
-
-    ResultTreeNode* prtree_returned = NULL;
-
-    if (prtree->right != NULL)
-        prtree_returned = getHighestLeafValueOfSpecifiedSize(prtree->right, sizeX, sizeY, sizeZ);
-
-    if (prtree_returned != NULL) // right leaf descendent
-        return (prtree_returned); // thus highest value leaf
-    else { // no right leaf descendents
-        if (prtree->pnode->isLeaf // this is leaf
-                && ((sizeX < 0.0) || (fabs(prtree->pnode->ds.x - sizeX) < SIZE_TOLERANCE))
-                && ((sizeY < 0.0) || (fabs(prtree->pnode->ds.y - sizeY) < SIZE_TOLERANCE))
-                && ((sizeZ < 0.0) || (fabs(prtree->pnode->ds.z - sizeZ) < SIZE_TOLERANCE))
-                ) // is specified size
-            return (prtree); // thus highest value leaf that is not too small
-    }
-
-    if (prtree->left != NULL) // look for left leaf descendents
-        prtree_returned = getHighestLeafValueOfSpecifiedSize(prtree->left, sizeX, sizeY, sizeZ);
-
-    return (prtree_returned);
-}
-
-/*** function to get ResultTree Leaf Node at specified level with highest value */
-
-ResultTreeNode* getHighestLeafValueAtSpecifiedLevel(ResultTreeNode* prtree, int level) {
-
-    ResultTreeNode* prtree_returned = NULL;
-
-    if (prtree->right != NULL)
-        prtree_returned = getHighestLeafValueAtSpecifiedLevel(prtree->right, level);
-
-    if (prtree_returned != NULL) // right leaf descendent
-        return (prtree_returned); // thus highest value leaf
-    else { // no right leaf descendents
-        if ((prtree->level == level) // is specified level
-                && prtree->pnode->isLeaf) // this is leaf
-            return (prtree); // thus highest value leaf that is at specfied level
-    }
-
-    if (prtree->left != NULL) // look for left leaf descendents
-        prtree_returned = getHighestLeafValueAtSpecifiedLevel(prtree->left, level);
-
-    return (prtree_returned);
-}
-
-/*** function to get ResultTree Leaf Node at level less than or equal to specified level with highest value */
-
-ResultTreeNode* getHighestLeafValueLESpecifiedLevel(ResultTreeNode* prtree, int level) {
-
-    ResultTreeNode* prtree_returned = NULL;
-
-    if (prtree->right != NULL)
-        prtree_returned = getHighestLeafValueLESpecifiedLevel(prtree->right, level);
-
-    if (prtree_returned != NULL) // right leaf descendent
-        return (prtree_returned); // thus highest value leaf
-    else { // no right leaf descendents
-        if ((prtree->level <= level) // is less than or equal to specified level
-                && prtree->pnode->isLeaf) // this is leaf
-            return (prtree); // thus highest value leaf that is <= specified level
-    }
-
-    if (prtree->left != NULL) // look for left leaf descendents
-        prtree_returned = getHighestLeafValueLESpecifiedLevel(prtree->left, level);
-
-    return (prtree_returned);
-}
-
-/*** function to get ResultTree Leaf Node at level greater than or equal to specified level with highest value */
-
-ResultTreeNode* getHighestLeafValueGESpecifiedLevel(ResultTreeNode* prtree, int level) {
-
-    ResultTreeNode* prtree_returned = NULL;
-
-    if (prtree->right != NULL)
-        prtree_returned = getHighestLeafValueGESpecifiedLevel(prtree->right, level);
-
-    if (prtree_returned != NULL) // right leaf descendent
-        return (prtree_returned); // thus highest value leaf
-    else { // no right leaf descendents
-        if ((prtree->level >= level) // is greater than or equal to specified level
-                && prtree->pnode->isLeaf) // this is leaf
-            return (prtree); // thus highest value leaf that is >= specified level
-    }
-
-    if (prtree->left != NULL) // look for left leaf descendents
-        prtree_returned = getHighestLeafValueGESpecifiedLevel(prtree->left, level);
-
-    return (prtree_returned);
-}
 
 /*** function to read a Tree3D ***/
 
@@ -1130,6 +933,37 @@ double convertOcttreeValuesToProb(ResultTreeNode* prtree, double integral, doubl
 
 }
 
+
+/*** function to check if node or half-segments of adjacent equal-size nodes contains the given x, y, z coordinates ***/
+
+int extendedNodeContains(OctNode* node, double x, double y, double z, int checkZ) {
+
+    Vect3D ds;
+    double dx2, dy2, dz2;
+
+    ds = node->ds;
+
+    dx2 = ds.x;
+    if (x < node->center.x - dx2 || x > node->center.x + dx2)
+        return (0);
+
+    dy2 = ds.y;
+    if (y < node->center.y - dy2 || y > node->center.y + dy2)
+        return (0);
+
+    if (checkZ) {
+        dz2 = ds.z;
+        if (z < node->center.z - dz2 || z > node->center.z + dz2)
+
+            return (0);
+    }
+
+    return (1);
+
+}
+
+#ifdef NLL_DEAD_CODE
+
 /** function to create a new ResultTree using node values */
 
 ResultTreeNode * createResultTree(ResultTreeNode* prtree, ResultTreeNode * pnew_rtree) {
@@ -1151,4 +985,164 @@ ResultTreeNode * createResultTree(ResultTreeNode* prtree, ResultTreeNode * pnew_
 
 }
 
+/*** function to get ResultTree Leaf Node at specified level with highest value */
 
+ResultTreeNode* getHighestLeafValueAtSpecifiedLevel(ResultTreeNode* prtree, int level) {
+
+    ResultTreeNode* prtree_returned = NULL;
+
+    if (prtree->right != NULL)
+        prtree_returned = getHighestLeafValueAtSpecifiedLevel(prtree->right, level);
+
+    if (prtree_returned != NULL) // right leaf descendent
+        return (prtree_returned); // thus highest value leaf
+    else { // no right leaf descendents
+        if ((prtree->level == level) // is specified level
+                && prtree->pnode->isLeaf) // this is leaf
+            return (prtree); // thus highest value leaf that is at specfied level
+    }
+
+    if (prtree->left != NULL) // look for left leaf descendents
+        prtree_returned = getHighestLeafValueAtSpecifiedLevel(prtree->left, level);
+
+    return (prtree_returned);
+}
+
+/*** function to get ResultTree Leaf Node at level greater than or equal to specified level with highest value */
+
+ResultTreeNode* getHighestLeafValueGESpecifiedLevel(ResultTreeNode* prtree, int level) {
+
+    ResultTreeNode* prtree_returned = NULL;
+
+    if (prtree->right != NULL)
+        prtree_returned = getHighestLeafValueGESpecifiedLevel(prtree->right, level);
+
+    if (prtree_returned != NULL) // right leaf descendent
+        return (prtree_returned); // thus highest value leaf
+    else { // no right leaf descendents
+        if ((prtree->level >= level) // is greater than or equal to specified level
+                && prtree->pnode->isLeaf) // this is leaf
+            return (prtree); // thus highest value leaf that is >= specified level
+    }
+
+    if (prtree->left != NULL) // look for left leaf descendents
+        prtree_returned = getHighestLeafValueGESpecifiedLevel(prtree->left, level);
+
+    return (prtree_returned);
+}
+
+/*** function to get ResultTree Leaf Node at level less than or equal to specified level with highest value */
+
+ResultTreeNode* getHighestLeafValueLESpecifiedLevel(ResultTreeNode* prtree, int level) {
+
+    ResultTreeNode* prtree_returned = NULL;
+
+    if (prtree->right != NULL)
+        prtree_returned = getHighestLeafValueLESpecifiedLevel(prtree->right, level);
+
+    if (prtree_returned != NULL) // right leaf descendent
+        return (prtree_returned); // thus highest value leaf
+    else { // no right leaf descendents
+        if ((prtree->level <= level) // is less than or equal to specified level
+                && prtree->pnode->isLeaf) // this is leaf
+            return (prtree); // thus highest value leaf that is <= specified level
+    }
+
+    if (prtree->left != NULL) // look for left leaf descendents
+        prtree_returned = getHighestLeafValueLESpecifiedLevel(prtree->left, level);
+
+    return (prtree_returned);
+}
+
+/*** function to get ResultTree Leaf Node with highest value, node size must be less than or equal to specified maximum size */
+
+ResultTreeNode* getHighestLeafValueLESpecifiedSize(ResultTreeNode* prtree, double sizeX, double sizeY, double sizeZ) {
+
+    ResultTreeNode* prtree_returned = NULL;
+
+    if (prtree->right != NULL)
+        prtree_returned = getHighestLeafValueLESpecifiedSize(prtree->right, sizeX, sizeY, sizeZ);
+
+    if (prtree_returned != NULL) // right leaf descendent
+        return (prtree_returned); // thus highest value leaf
+    else { // no right leaf descendents
+        if (prtree->pnode->isLeaf // this is leaf
+                && ((sizeX < 0.0) || (prtree->pnode->ds.x - sizeX < SIZE_TOLERANCE))
+                && ((sizeY < 0.0) || (prtree->pnode->ds.y - sizeY < SIZE_TOLERANCE))
+                && ((sizeZ < 0.0) || (prtree->pnode->ds.z - sizeZ < SIZE_TOLERANCE))
+                ) // is specified size
+            return (prtree); // thus highest value leaf that is not too small
+    }
+
+    if (prtree->left != NULL) // look for left leaf descendents
+        prtree_returned = getHighestLeafValueLESpecifiedSize(prtree->left, sizeX, sizeY, sizeZ);
+
+    return (prtree_returned);
+}
+
+/*** function to get ResultTree Leaf Node with highest value, node size must be equal to specified maximum size */
+
+ResultTreeNode* getHighestLeafValueOfSpecifiedSize(ResultTreeNode* prtree, double sizeX, double sizeY, double sizeZ) {
+
+    ResultTreeNode* prtree_returned = NULL;
+
+    if (prtree->right != NULL)
+        prtree_returned = getHighestLeafValueOfSpecifiedSize(prtree->right, sizeX, sizeY, sizeZ);
+
+    if (prtree_returned != NULL) // right leaf descendent
+        return (prtree_returned); // thus highest value leaf
+    else { // no right leaf descendents
+        if (prtree->pnode->isLeaf // this is leaf
+                && ((sizeX < 0.0) || (fabs(prtree->pnode->ds.x - sizeX) < SIZE_TOLERANCE))
+                && ((sizeY < 0.0) || (fabs(prtree->pnode->ds.y - sizeY) < SIZE_TOLERANCE))
+                && ((sizeZ < 0.0) || (fabs(prtree->pnode->ds.z - sizeZ) < SIZE_TOLERANCE))
+                ) // is specified size
+            return (prtree); // thus highest value leaf that is not too small
+    }
+
+    if (prtree->left != NULL) // look for left leaf descendents
+        prtree_returned = getHighestLeafValueOfSpecifiedSize(prtree->left, sizeX, sizeY, sizeZ);
+
+    return (prtree_returned);
+}
+
+/*** function to get ResultTreeNode with highest value */
+
+ResultTreeNode* getHighestValue(ResultTreeNode* prtree) {
+
+    if (prtree == NULL)
+        return (NULL);
+
+    if (prtree->right == NULL) /* right child is empty */
+        return (prtree);
+
+    return (getHighestValue(prtree->right));
+}
+
+/*** function to check if node contains the given x, y, z coordinates ***/
+
+int nodeContains(OctNode* node, double x, double y, double z) {
+
+    Vect3D ds;
+    double dx2, dy2, dz2;
+
+    ds = node->ds;
+
+    dx2 = ds.x / 2.0;
+    if (x < node->center.x - dx2 || x > node->center.x + dx2)
+        return (0);
+
+    dy2 = ds.y / 2.0;
+    if (y < node->center.y - dy2 || y > node->center.y + dy2)
+        return (0);
+
+    dz2 = ds.z / 2.0;
+    if (z < node->center.z - dz2 || z > node->center.z + dz2)
+
+        return (0);
+
+    return (1);
+
+}
+
+#endif //NLL_DEAD_CODE

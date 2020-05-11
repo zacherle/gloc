@@ -41,19 +41,11 @@ typedef struct {
 
 char *get_matrix_statistics_error_mesage();
 Vect3D CalcExpectationSamples(float*, int);
-Vect3D CalcExpectationSamplesWeighted(float* fdata, int nSamples);
-Vect3D CalcExpectationSamplesGlobal(float* fdata, int nSamples, double xReference);
-Vect3D CalcExpectationSamplesGlobalWeighted(float* fdata, int nSamples, double xReference);
 Mtrx3D CalcCovarianceSamplesRect(float* fdata, int nSamples, Vect3D* pexpect);
 Mtrx3D CalcCovarianceSamplesGlobal(float* fdata, int nSamples, Vect3D* pexpect);
-Mtrx3D CalcCovarianceSamplesGlobalWeighted(float* fdata, int nSamples, Vect3D* pexpect);
 Ellipsoid3D CalcErrorEllipsoid(Mtrx3D *, double);
 Ellipse2D CalcHorizontalErrorEllipse(Mtrx3D *pcov, double del_chi_2);
 void ellipsiod2Axes(Ellipsoid3D *, Vect3D *, Vect3D *, Vect3D *);
-void nllEllipsiod2XMLConfidenceEllipsoid(Ellipsoid3D *pellipsoid,
-        double* psemiMajorAxisLength, double* pmajorAxisPlunge, double* pmajorAxisAzimuth,
-        double* psemiIntermediateAxisLength, double* pintermediateAxisPlunge, double* pintermediateAxisAzimuth,
-        double* psemiMinorAxisLength);
 int nllEllipsiod2QMLConfidenceEllipsoid(Ellipsoid3D *pellipsoid,
         double* psemiMajorAxisLength,
         double* psemiMinorAxisLength,
@@ -62,5 +54,16 @@ int nllEllipsiod2QMLConfidenceEllipsoid(Ellipsoid3D *pellipsoid,
         double* pmajorAxisPlunge,
         double* pmajorAxisRotation);
 
+
+#ifdef NLL_DEAD_CODE
+Mtrx3D CalcCovarianceSamplesGlobalWeighted(float* fdata, int nSamples, Vect3D* pexpect);
+Vect3D CalcExpectationSamplesGlobal(float* fdata, int nSamples, double xReference);
+Vect3D CalcExpectationSamplesGlobalWeighted(float* fdata, int nSamples, double xReference);
+Vect3D CalcExpectationSamplesWeighted(float* fdata, int nSamples);
+void nllEllipsiod2XMLConfidenceEllipsoid(Ellipsoid3D *pellipsoid,
+        double* psemiMajorAxisLength, double* pmajorAxisPlunge, double* pmajorAxisAzimuth,
+        double* psemiIntermediateAxisLength, double* pintermediateAxisPlunge, double* pintermediateAxisAzimuth,
+        double* psemiMinorAxisLength);
+#endif //NLL_DEAD_CODE
 
 #endif //MATRIX_STATISTICS_H

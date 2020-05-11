@@ -35,8 +35,8 @@ Anthony Lomax Scientific Software
 tel: +33(0)493752502  e-mail: anthony@alomax.net  web: http://www.alomax.net
 -------------------------------------------------------------------------*/
 
-#include "GridLib.h"
-
+#include "location.h"
+//#include "GridLib.h"
 
 
 /*------------------------------------------------------------/ */
@@ -46,17 +46,17 @@ tel: +33(0)493752502  e-mail: anthony@alomax.net  web: http://www.alomax.net
 
 /* location structure */
 
-typedef struct location
-{
-	HypoDesc* phypo;	/* location data */
-	ArrivalDesc* parrivals;	/* phase arrival data */
-		/* WARNING: for nll_assoc this data is temporary, definitive associated arrivals specified by PhsNode.passoc_locations location id list!!! */
-	int narrivals;		/* num of phase arrival data */
-	GridDesc* pgrid;	/* location grid */
-	Tree3D* poctTree;	/* location oct-tree structure */
-	float* pscatterSample;	/* location scatter sample data */
-
-} Location;
+//typedef struct location
+//{
+//	HypoDesc* phypo;	/* location data */
+//	ArrivalDesc* parrivals;	/* phase arrival data */
+//		/* WARNING: for nll_assoc this data is temporary, definitive associated arrivals specified by PhsNode.passoc_locations location id list!!! */
+//	int narrivals;		/* num of phase arrival data */
+//	GridDesc* pgrid;	/* location grid */
+//	Tree3D* poctTree;	/* location oct-tree structure */
+//	float* pscatterSample;	/* location scatter sample data */
+//
+//} Location;
 
 
 /* loclist node structure*/
@@ -82,9 +82,9 @@ typedef struct locnode
 /*------------------------------------------------------------/ */
 
 /* loclist */
-
 Location *newLocation(HypoDesc *phypo, ArrivalDesc* parrivals, int narrivals, GridDesc *pgrid, Tree3D* poctTree, float *pscatterSample);
 LocNode *addLocationToLocList(LocNode **phead, Location *plocation, int id);
+/*
 LocNode *removeLocationFromLocList(LocNode *head, LocNode* addr, int freeHypoDesc);
 int freeLocList(LocNode *head, int freeHypoDesc);
 void freeLocation(Location *plocation);
@@ -97,7 +97,7 @@ ArrivalDesc *findArrivalInLocation(Location *plocation, ArrivalDesc *arrivalKey)
 int arrivalBeforeLastLocateArrival(ArrivalDesc *arrivalKey, Location *plocation);
 // AJL 20070323-
 LocNode *getLocationFromLocList(LocNode *head, int id);
-
+*/
 
 /* */
 /*------------------------------------------------------------/ */

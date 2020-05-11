@@ -137,14 +137,8 @@ OctNode* getLeafNodeContaining(Tree3D* tree, Vect3D coords);
 
 ResultTreeNode* addResult(ResultTreeNode* prtn, double value, double volume, OctNode* pnode);
 void freeResultTree(ResultTreeNode* prtn);
-//ResultTreeNode* getHighestValue(ResultTreeNode* prtn);
 ResultTreeNode* getHighestLeafValue(ResultTreeNode* prtree);
 ResultTreeNode* getHighestLeafValueMinSize(ResultTreeNode* prtree, double sizeMinX, double sizeMinY, double sizeMinZ);
-//ResultTreeNode* getHighestLeafValueLESpecifiedSize(ResultTreeNode* prtree, double sizeX, double sizeY, double sizeZ);
-//ResultTreeNode* getHighestLeafValueOfSpecifiedSize(ResultTreeNode* prtree, double sizeX, double sizeY, double sizeZ);
-//ResultTreeNode* getHighestLeafValueAtSpecifiedLevel(ResultTreeNode* prtree, int level);
-//ResultTreeNode* getHighestLeafValueLESpecifiedLevel(ResultTreeNode* prtree, int level);
-//ResultTreeNode* getHighestLeafValueGESpecifiedLevel(ResultTreeNode* prtree, int level);
 
 Tree3D* readTree3D(FILE *fpio);
 
@@ -152,8 +146,6 @@ Tree3D* readTree3D(FILE *fpio);
 int writeTree3D(FILE *fpio, Tree3D* tree);
 //int writeNode(FILE *fpio, OctNode* node);
 
-//int nodeContains(OctNode* node, double x, double y, double z);
-int extendedNodeContains(OctNode* node, double x, double y, double z, int checkZ);
 
 //int getScatterSampleResultTreeAtLevels(ResultTreeNode* prtree, int value_type, int num_scatter,
 //        double integral, float* fdata, int npoints, int* pfdata_index,
@@ -164,9 +156,20 @@ int getScatterSampleResultTree(ResultTreeNode* prtree, int value_type, int num_s
 double convertOcttreeValuesToProb(ResultTreeNode* prtree, double sum, double oct_node_value_max);
 //double integrateResultTreeAtLevels(ResultTreeNode* prtree, int value_type, double sum, double oct_node_value_max, int level_min, int level_max);
 double integrateResultTree(ResultTreeNode* prtree, int value_type, double sum, double oct_node_value_max);
+
+int extendedNodeContains(OctNode* node, double x, double y, double z, int checkZ);
+
+#ifdef NLL_DEAD_CODE
 //ResultTreeNode* createResultTree(ResultTreeNode* prtree, ResultTreeNode* pnew_rtree);
+//ResultTreeNode* getHighestLeafValueAtSpecifiedLevel(ResultTreeNode* prtree, int level);
+//ResultTreeNode* getHighestLeafValueGESpecifiedLevel(ResultTreeNode* prtree, int level);
+//ResultTreeNode* getHighestLeafValueLESpecifiedLevel(ResultTreeNode* prtree, int level);
+//ResultTreeNode* getHighestLeafValueLESpecifiedSize(ResultTreeNode* prtree, double sizeX, double sizeY, double sizeZ);
+//ResultTreeNode* getHighestLeafValueOfSpecifiedSize(ResultTreeNode* prtree, double sizeX, double sizeY, double sizeZ);
+//ResultTreeNode* getHighestValue(ResultTreeNode* prtn);
+//int nodeContains(OctNode* node, double x, double y, double z);
 
-
+#endif //NLL_DEAD_CODE
 /* */
 /*------------------------------------------------------------/ */
 

@@ -37,16 +37,19 @@
 
 double GCDistance(double lat1, double lon1, double lat2, double lon2);
 
+double EllipsoidAzimuth(double lat1, double lon1, double lat2, double lon2);
+
+double GCAzimuth(double lat1, double lon1, double lat2, double lon2);
+
+double ApproxAzimuth(double lat1, double lon1, double lat2, double lon2);
+
+#ifdef NLL_DEAD_CODE
 double ApproxDistance(double lat1, double lon1, double lat2, double lon2);
 
 double EllipsoidDistance(double lat1, double lon1, double lat2, double lon2);
 
-double GCAzimuth(double lat1, double lon1, double lat2, double lon2);
-
-double EllipsoidAzimuth(double lat1, double lon1, double lat2, double lon2);
-
-double ApproxAzimuth(double lat1, double lon1, double lat2, double lon2);
-
 void PointAtGCDistanceAzimuth(double lat1, double lon1, double dist, double az, double* lat2, double* lon2);
+#endif //NLL_DEAD_CODE
+
 
 #endif //GEO_H

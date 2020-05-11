@@ -67,6 +67,8 @@ double GCAzimuth(double lat1, double lon1, double lat2, double lon2) {
     return (az);
 }
 
+#ifdef NLL_DEAD_CODE
+
 double GCAzimuth_ERROR(double lat1, double lon1, double lat2, double lon2) {
     double result = 0.0;
 
@@ -237,3 +239,5 @@ void PointAtGCDistanceAzimuth(double lat1, double lon1, double dist, double az, 
     *lon2 = RA2DE * (atan2(sinc * sinAz, cosphi1 * cosc - sinphi1 * sinc * cosAz) + lambda0);
 
 }
+
+#endif //NLL_DEAD_CODE

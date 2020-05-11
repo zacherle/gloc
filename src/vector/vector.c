@@ -27,14 +27,6 @@
 
 #include <math.h>
 
-/*** function to calculate dot product of 3-D vectors (A o B) */
-
-double dot_product_3d(a1, a2, a3, b1, b2, b3)		    
-double a1, a2, a3, b1, b2, b3;
-{
-	return(a1 * b1 + a2 * b2 + a3 * b3);
-}
-
 
 /*** function to calculate cross product of 3-D vectors (A X B) */
 
@@ -50,6 +42,16 @@ double *p1, *p2, *p3;
 }
 
 
+#ifdef NLL_DEAD_CODE
+
+/*** function to calculate dot product of 3-D vectors (A o B) */
+
+double dot_product_3d(a1, a2, a3, b1, b2, b3)		    
+double a1, a2, a3, b1, b2, b3;
+{
+	return(a1 * b1 + a2 * b2 + a3 * b3);
+}
+
 /*** function to calculate magnitude of 3-D vectors ||A|| */
 
 double magnitude_3d(a1, a2, a3)		    
@@ -57,3 +59,6 @@ double a1, a2, a3;
 {
 	return(sqrt(a1 * a1 + a2 * a2 + a3 * a3));
 }
+
+#endif //NLL_DEAD_CODE
+

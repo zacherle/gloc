@@ -16,17 +16,23 @@ In particular, adaptation is needed for
 ## Major program changes
 Backward compatibility may be lost during editing.
 
-1) Only core programs 
-   (Vel2Grid, Grid2Time, Time2Angles, NLLoc, LocSum, Grid2GMT, Time2EQ )
-   from this distribution are of interest.
+### Code organization
+1. Marginal programs deleted.   
+   Only core programs from this distribution 
+   (Vel2Grid, Grid2Time, Time2Angles, NLLoc, LocSum, Grid2GMT, Time2EQ 
+   and their modules) are of interest.
    Most utilities and marginal programs with little chance of use have been deleted.
-2) Grid2GMT5 works with GMT 5 version. 
-   The new MAPLINE GMT_YX_K option is for Krovak map coordinates. 
-3) Programs use many global variables defined in header files.
+2. Declaration and definition of variables separated.   
+   Programs use many global variables defined in header files.
    In order to find out which variables require an external link,
    the variables are defined in the code and declared in the header file
-   (library modules GridLib, GridMemLib, velmod, util, NLLocLib, GridGraphLib).
+   (modules GridLib, GridMemLib, velmod, util, NLLocLib, GridGraphLib).
+3. Header files enclosed by #include guards.
+4. The dead code identified and enclosed in the #ifdef directive.
 
+### Program functions
+1. Grid2GMT5 works with GMT 5 version. 
+   The new MAPLINE GMT_YX_K option is for Krovak map coordinates. 
 
 ## Documentation
 Documentation of the original program is available on the

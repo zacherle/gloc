@@ -719,16 +719,13 @@ int ConvertASourceLocation(int n_proj, SourceDesc *srce_in, int toXY, int toLatL
 /* grid functions */
 void* AllocateGrid(GridDesc*);
 void FreeGrid(GridDesc*);
-int InitializeGrid(GridDesc*, GRID_FLOAT_TYPE);
 void*** CreateGridArray(GridDesc*);
 void DestroyGridArray(GridDesc*);
 void DuplicateGrid(GridDesc*, GridDesc*, char *);
 int CheckGridArray(GridDesc*, double, double, double, double);
-int SumGrids(GridDesc* pgrid_sum, GridDesc* pgrid_new, FILE* fp_grid_new, double factor);
 int WriteGrid3dBuf(GridDesc*, SourceDesc*, char*, char*);
 int WriteGrid3dHdr(GridDesc*, SourceDesc*, char*, char*);
 int ReadGrid3dBuf(GridDesc*, FILE*);
-int ReadGrid3dHdr(GridDesc*, SourceDesc*, char*, char*);
 int ReadGrid3dHdr_grid_description(FILE *fpio, GridDesc* pgrid, char *fname);
 int ReadGrid3dBufSheet(GRID_FLOAT_TYPE *, GridDesc*, FILE*, int);
 GRID_FLOAT_TYPE ReadAbsGrid3dValue(FILE*, GridDesc*, double, double,
@@ -767,7 +764,6 @@ void FreeGrid_Cascading(GridDesc * pgrid);
 /* statistics functions */
 double normal_dist_deviate();
 void test_normal_dist_deviate();
-int GenTraditionStats(GridDesc*, Vect3D*, Mtrx3D*, FILE*);
 Vect3D CalcExpectation(GridDesc*, FILE*);
 Mtrx3D CalcCovariance(GridDesc*, Vect3D*, FILE*);
 Mtrx3D CalcCovarianceSamples(float*, int, Vect3D*);
@@ -775,10 +771,6 @@ Mtrx3D CalcCovarianceSamples(float*, int, Vect3D*);
 /* hypocenter functions */
 int WriteLocation(FILE*, HypoDesc*, ArrivalDesc*, int, char*,
         int, int, int, GridDesc*, int);
-int WritePhases(FILE *fpio, HypoDesc* phypo, ArrivalDesc* parrivals,
-        int narrivals, char* filename,
-        int iWriteArrivals, int iWriteEndLoc, int iWriteMinimal,
-        GridDesc* pgrid, int n_proj, int io_arrival_mode);
 int GetHypLoc(FILE*, const char*, HypoDesc*, ArrivalDesc*, int*, int, GridDesc*, int);
 int ReadArrival(char*, ArrivalDesc*, int);
 int WriteArrival(FILE*, ArrivalDesc*, int);
@@ -804,7 +796,6 @@ double GetEpiDist(SourceDesc*, double, double);
 double GetEpiAzim(SourceDesc*, double, double);
 double GetEpiDistSta(StationDesc*, double, double);
 double GetEpiAzimSta(StationDesc*, double, double);
-double Dist2D(double, double, double, double);
 double Dist3D(double, double, double, double, double, double);
 double calcAveInterStationDistance(SourceDesc *stations, int numStations);
 int stationLocationIsKnown(double x, double y);
@@ -865,6 +856,23 @@ int ReadFortranReal(char*, int, int, double*);
 /* OctTree support */
 int ConvertOctTree2Grid(Tree3D* tree, double dx, double dy, double dz, char *grid_type, GridDesc *pgrid_out);
 
+/* */
+/*------------------------------------------------------------/ */
+
+
+#ifdef NLL_DEAD_CODE
+
+double Dist2D(double, double, double, double);
+int GenTraditionStats(GridDesc*, Vect3D*, Mtrx3D*, FILE*);
+int InitializeGrid(GridDesc*, GRID_FLOAT_TYPE);
+int ReadGrid3dHdr(GridDesc*, SourceDesc*, char*, char*);
+int SumGrids(GridDesc* pgrid_sum, GridDesc* pgrid_new, FILE* fp_grid_new, double factor);
+
+int WritePhases(FILE *fpio, HypoDesc* phypo, ArrivalDesc* parrivals,
+        int narrivals, char* filename,
+        int iWriteArrivals, int iWriteEndLoc, int iWriteMinimal,
+        GridDesc* pgrid, int n_proj, int io_arrival_mode);
+
 /* misc functions */
 int ReadFpfitSum(FILE *fp_in, HypoDesc *phypo);
 
@@ -874,9 +882,9 @@ int WriteHypoDDInitHypo(FILE *fp_out, HypoDesc *phypo);
 int WriteHypoDDXCorrDiff(FILE *fp_out, int num_arrivals, ArrivalDesc *arrival, HypoDesc *phypo);
 int WriteDiffArrival(FILE* fpio, HypoDesc* hypos, ArrivalDesc* parr, int iWriteType);
 
+#endif //NLL_DEAD_CODE
 
-/* */
-/*------------------------------------------------------------/ */
+
 
 
 #endif //GRIDLIB_H

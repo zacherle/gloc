@@ -62,7 +62,6 @@ rank can be computed from this decomposition.
  */
 static MatrixDouble U_matrix = NULL;
 static MatrixDouble V_matrix = NULL;
-static MatrixDouble S_matrix = NULL;
 
 /** Array for internal storage of singular values.
 @serial internal storage of singular values.
@@ -548,6 +547,26 @@ void clean_SingularValueDecomposition() {
 }
 
 /**
+Returns the diagonal of <tt>S</tt>, which is a one-dimensional array of singular values
+@return     diagonal of <tt>S</tt>.
+ */
+VectorDouble svd_getSingularValues() {
+    return singular_values;
+}
+
+/**
+Returns the right singular vectors <tt>V</tt>.
+@return     <tt>V</tt>
+ */
+MatrixDouble svd_getV() {
+    return (V_matrix);
+}
+
+#ifdef NLL_DEAD_CODE
+
+static MatrixDouble S_matrix = NULL;
+
+/**
 Returns the two norm condition number, which is <tt>max(S) / min(S)</tt>.
  */
 double svd_cond() {
@@ -575,14 +594,6 @@ MatrixDouble svd_getS() {
 }
 
 /**
-Returns the diagonal of <tt>S</tt>, which is a one-dimensional array of singular values
-@return     diagonal of <tt>S</tt>.
- */
-VectorDouble svd_getSingularValues() {
-    return singular_values;
-}
-
-/**
 Returns the left singular vectors <tt>U</tt>.
 @return     <tt>U</tt>
  */
@@ -590,14 +601,6 @@ MatrixDouble svd_getU() {
     //return new DoubleMatrix2D(U,m,Math_min(m+1,n));
     //return DoubleFactory2D.dense.make(U).viewPart(0, 0, num_rows, Math_min(num_rows + 1, num_columns));
     return (U_matrix); // TODO: should be partial matrix, see lines above
-}
-
-/**
-Returns the right singular vectors <tt>V</tt>.
-@return     <tt>V</tt>
- */
-MatrixDouble svd_getV() {
-    return (V_matrix);
 }
 
 /**
@@ -623,7 +626,7 @@ int svd_rank() {
     return r;
 }
 
-
+#endif //NLL_DEAD_CODE
 
 
 /**

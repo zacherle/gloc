@@ -29,6 +29,8 @@ CC=gcc
 
 # Linux
 #CCFLAGS_BASIC =  -Wall -std=gnu99 ${GRID_FLOAT} -Wno-unused-but-set-variable
+#CCFLAGS_BASIC =  -Wall -std=gnu99 ${GRID_FLOAT} -O0 -ffunction-sections -Wl,--gc-sections
+#CCFLAGS_BASIC =  -Wall -std=gnu99 ${GRID_FLOAT} -D NLL_DEAD_CODE
 CCFLAGS_BASIC =  -Wall -std=gnu99 ${GRID_FLOAT}
 #
 #
@@ -61,7 +63,7 @@ TIME3D_CCFLAGS=
 # --------------------------------------------------------------------------
 # Top level variables and rules
 #
-GRID_LIB_OBJS=GridLib.o util.o geo.o octtree/octtree.o alomax_matrix/alomax_matrix.o alomax_matrix/eigv.o alomax_matrix/alomax_matrix_svd.o matrix_statistics/matrix_statistics.o vector/vector.o ran1/ran1.o map_project.o
+GRID_LIB_OBJS=GridLib.o util.o geo.o octtree/octtree.o alomax_matrix/alomax_matrix.o alomax_matrix/alomax_matrix_svd.o matrix_statistics/matrix_statistics.o vector/vector.o ran1/ran1.o map_project.o
 NLLOC_LIB_OBJS=velmod.o GridMemLib.o phaselist.o loclist.o otime_limit.o
 
 DISTRIB_SOURCES=NLLoc_ Vel2Grid_ Grid2Time_ Time2Angles_ Grid2GMT_ LocSum_ scat2latlon_ Time2EQ_ oct2grid_
@@ -230,9 +232,9 @@ GridMemLib.o : GridMemLib.c GridMemLib.h  GridLib.h
 
 GridGraphLib.o : GridGraphLib.c GridLib.h GridGraphLib.h
 
-phaselist.o : phaselist.c phaselist.h  GridLib.h
+phaselist.o : phaselist.c phaselist.h  location.h GridLib.h
 
-loclist.o : loclist.c loclist.h  GridLib.h
+loclist.o : loclist.c loclist.h  location.h GridLib.h
 
 otime_limit.o : otime_limit.c otime_limit.h
 
@@ -252,7 +254,8 @@ clean_bin :
 	rm -f ${BINDIR}/Vel2Grid ${BINDIR}/oct2grid ${BINDIR}/NLLoc \
 	${BINDIR}/LocSum ${BINDIR}/Grid2Time ${BINDIR}/Time2Angles  \
 	${BINDIR}/Grid2GMT4 ${BINDIR}/Grid2GMT5  \
-	${BINDIR}/Time2EQ 
+	${BINDIR}/Time2EQ \
+	${BINDIR}/scat2latlon
 
 #
 # --------------------------------------------------------------------------

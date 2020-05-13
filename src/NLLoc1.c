@@ -169,10 +169,12 @@ int NLLoc
 
 
     // output
-    iSaveNLLocEvent = iSaveNLLocSum = iSaveHypo71Event = iSaveHypo71Sum
-            = iSaveHypoEllEvent = iSaveHypoEllSum
-            = iSaveHypoInvSum = iSaveHypoInvY2KArc
-            = iSaveAlberto4Sum = iSaveFmamp = iSaveNLLocOctree = iSaveNone = 0;
+    iSaveNLLocEvent = iSaveNLLocSum = iSaveNLLocOctree = iSaveNone = 0;
+//            = iSaveHypo71Event = iSaveHypo71Sum
+//            = iSaveHypoEllEvent = iSaveHypoEllSum
+//            = iSaveHypoInvSum = iSaveHypoInvY2KArc
+//            = iSaveAlberto4Sum = iSaveFmamp
+    
     // 20170811 AJL - added to allow saving of expectation hypocenter results instead of maximum likelihood
     iSaveNLLocExpectation = 0;
 

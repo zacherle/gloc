@@ -35,8 +35,8 @@ Anthony Lomax Scientific Software
 tel: +33(0)493752502  e-mail: anthony@alomax.net  web: http://www.alomax.net
 -------------------------------------------------------------------------*/
 
-#include "location.h"
 //#include "GridLib.h"
+#include "location.h"
 
 
 /*------------------------------------------------------------/ */

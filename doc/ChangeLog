@@ -1,3 +1,9 @@
+2020-05-13 v-0.9
+NLLocLib:
+Remove the seismic I / O phase file formats
+except for the native NLL format. 
+Add hypo3d phase file format (LOCFILES HYPO3D option).
+=======================================================================
 2020-05-09 v-0.8
 Identify the dead code and enclose it in the #ifdef directive.
 =======================================================================

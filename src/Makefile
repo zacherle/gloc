@@ -64,7 +64,7 @@ TIME3D_CCFLAGS=
 # Top level variables and rules
 #
 GRID_LIB_OBJS=GridLib.o util.o geo.o octtree/octtree.o alomax_matrix/alomax_matrix.o alomax_matrix/alomax_matrix_svd.o matrix_statistics/matrix_statistics.o vector/vector.o ran1/ran1.o map_project.o
-NLLOC_LIB_OBJS=velmod.o GridMemLib.o phaselist.o loclist.o otime_limit.o
+NLLOC_LIB_OBJS=velmod.o GridMemLib.o phaselist.o loclist.o otime_limit.o ioformat/hypfile.o
 
 DISTRIB_SOURCES=NLLoc_ Vel2Grid_ Grid2Time_ Time2Angles_ Grid2GMT_ LocSum_ scat2latlon_ Time2EQ_ oct2grid_
 all : ${DISTRIB_SOURCES}
@@ -224,7 +224,7 @@ scat2latlon.o : scat2latlon.c GridLib.h
 # NLL special compile rule
 #
 
-NLLocLib.o : NLLocLib.c NLLocLib.h GridLib.h velmod.h
+NLLocLib.o : NLLocLib.c NLLocLib.h GridLib.h velmod.h ioformat/hypfile.h
 
 GridLib.o : GridLib.c GridLib.h  geometry/geometry.h util.h geo.h octtree/octtree.h alomax_matrix/alomax_matrix.h alomax_matrix/alomax_matrix_svd.h matrix_statistics/matrix_statistics.h ran1/ran1.h map_project.h
 
@@ -236,7 +236,7 @@ phaselist.o : phaselist.c phaselist.h  location.h GridLib.h
 
 loclist.o : loclist.c loclist.h  location.h GridLib.h
 
-otime_limit.o : otime_limit.c otime_limit.h
+#otime_limit.o : otime_limit.c otime_limit.h
 
 #
 # --------------------------------------------------------------------------
@@ -248,7 +248,8 @@ otime_limit.o : otime_limit.c otime_limit.h
 #
 
 clean :
-	rm -f *.o alomax_matrix/*.o matrix_statistics/*.o ./octtree/octtree.o ./ran1/ran1.o ./vector/vector.o
+	rm -f *.o alomax_matrix/*.o matrix_statistics/*.o ./octtree/octtree.o \
+          ./ran1/ran1.o ./vector/vector.o ./ioformat/hypfile.o
 
 clean_bin :
 	rm -f ${BINDIR}/Vel2Grid ${BINDIR}/oct2grid ${BINDIR}/NLLoc \

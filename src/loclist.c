@@ -40,9 +40,9 @@ tel: +33(0)493752502  e-mail: anthony@alomax.net  web: http://www.alomax.net
 
 
 
-#include "loclist.h"
+//#include "GridLib.h"
 #include "location.h"
-#include "GridLib.h"
+#include "loclist.h"
 #include <stdio.h>
 
 #include "phaselist.h"
